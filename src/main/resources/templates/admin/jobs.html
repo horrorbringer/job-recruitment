@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>Manage Jobs</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-4">Manage Jobs</h2>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small">Total</div>
+                            <div class="fs-4 fw-bold" th:text="${stats.total}">0</div>
+                        </div>
+                        <i class="bi bi-briefcase fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small">Approved</div>
+                            <div class="fs-4 fw-bold" th:text="${stats.approved}">0</div>
+                        </div>
+                        <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small">Pending</div>
+                            <div class="fs-4 fw-bold" th:text="${stats.pending}">0</div>
+                        </div>
+                        <i class="bi bi-hourglass-split fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small">Rejected</div>
+                            <div class="fs-4 fw-bold" th:text="${stats.rejected}">0</div>
+                        </div>
+                        <i class="bi bi-x-circle fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${currentStatus == 'PENDING' || currentStatus == null} ? 'active'" 
+               th:href="@{/admin/jobs(status=PENDING)}">Pending</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${currentStatus == 'APPROVED'} ? 'active'" 
+               th:href="@{/admin/jobs(status=APPROVED)}">Approved</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${currentStatus == 'REJECTED'} ? 'active'" 
+               th:href="@{/admin/jobs(status=REJECTED)}">Rejected</a>
+        </li>
+    </ul>
+    
+    <div class="card">
+        <div class="card-body">
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <table class="table table-hover" th:if="${not #lists.isEmpty(jobs)}">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Posted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="job : ${jobs}">
+                        <td>
+                            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none fw-medium">Title</a>
+                        </td>
+                        <td th:text="${job.recruiter?.companyName}">Company</td>
+                        <td th:text="${job.location}">Location</td>
+                        <td>
+                            <span class="badge" th:classappend="${job.status.name() == 'APPROVED'} ? 'bg-success' : 
+                                (${job.status.name() == 'REJECTED'} ? 'bg-danger' : 'bg-warning')" 
+                                th:text="${job.status}">Status</span>
+                        </td>
+                        <td th:text="${#temporals.format(job.createdAt, 'MMM dd, yyyy')}">Date</td>
+                        <td>
+                            <div th:if="${job.status.name() == 'PENDING'}" class="btn-group">
+                                <form th:action="@{/admin/jobs/{id}/approve(id=${job.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                </form>
+                                <form th:action="@{/admin/jobs/{id}/reject(id=${job.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                </form>
+                            </div>
+                            <div th:if="${job.status.name() == 'APPROVED'}" class="btn-group">
+                                <form th:action="@{/admin/jobs/{id}/reject(id=${job.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">Reject</button>
+                                </form>
+                            </div>
+                            <div th:if="${job.status.name() == 'REJECTED'}" class="btn-group">
+                                <form th:action="@{/admin/jobs/{id}/approve(id=${job.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Approve</button>
+                                </form>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                    th:data-bs-target="'#deleteModal' + ${job.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div th:if="${#lists.isEmpty(jobs)}" class="text-center py-5">
+                <i class="bi bi-briefcase text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3" th:text="${currentStatus == 'PENDING' || currentStatus == null} ? 'No pending jobs' : 'No jobs found'">No jobs</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div th:each="job : ${jobs}">
+        <div class="modal fade" th:id="'deleteModal' + ${job.id}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Job</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete "<strong th:text="${job.title}"></strong>"?</p>
+                        <p class="text-muted">This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form th:action="@{/admin/jobs/{id}/delete(id=${job.id})}" method="post">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

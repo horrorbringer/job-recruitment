@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Search Jobs</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-5">
+        <h2 class="mb-4">Search Results</h2>
+        
+        <form th:action="@{/jobs/search}" th:object="${search}" method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword" th:field="*{keyword}" placeholder="Keyword">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="location" th:field="*{location}" placeholder="Location">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="categoryId">
+                        <option value="">All Categories</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
+                <div class="card h-100 job-card hover-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none">Job Title</a>
+                        </h5>
+                        <p class="text-muted" th:text="${job.recruiter?.companyName}">Company</p>
+                        <div class="mb-2">
+                            <span class="badge bg-light text-dark" th:text="${job.location}">Location</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

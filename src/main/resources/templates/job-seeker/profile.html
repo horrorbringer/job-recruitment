@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>My Profile</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-4">My Profile</h2>
+    
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    
+    <form th:action="@{/job-seeker/profile}" th:object="${profileDTO}" method="post">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Personal Information</h5>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" th:field="*{fullName}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" th:field="*{phone}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-control" th:field="*{location}">
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Professional Details</h5>
+                <div class="mb-3">
+                    <label class="form-label">Skills</label>
+                    <textarea class="form-control" th:field="*{skills}" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Education</label>
+                    <textarea class="form-control" th:field="*{education}" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">About</label>
+                    <textarea class="form-control" th:field="*{about}" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Profile</button>
+    </form>
+</main>
+</body>
+</html>

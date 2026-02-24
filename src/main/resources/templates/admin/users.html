@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>Manage Users</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-4">Manage Users</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Locked</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.email}">Email</td>
+                        <td th:text="${user.role}">Role</td>
+                        <td>
+                            <span class="badge" th:classappend="${user.enabled ? 'bg-success' : 'bg-danger'}" th:text="${user.enabled ? 'Active' : 'Inactive'}">Status</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${user.accountNonLocked ? 'bg-success' : 'bg-warning'}" th:text="${user.accountNonLocked ? 'Unlocked' : 'Locked'}">Locked</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Toggle Status</button>
+                            </form>
+                            <form th:action="@{/admin/users/{id}/toggle-lock(id=${user.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-warning">Toggle Lock</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

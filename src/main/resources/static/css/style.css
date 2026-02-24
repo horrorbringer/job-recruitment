@@ -1,0 +1,227 @@
+:root {
+    --primary-color: #2563eb;
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #334155;
+    --bg-color: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+}
+
+.bg-gradient-primary {
+    background: var(--primary-color);
+}
+
+.hover-shadow {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.job-card, .category-card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg);
+}
+
+.hero-section {
+    min-height: 400px;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+/* Dashboard */
+.dashboard-body {
+    background-color: var(--bg-color);
+}
+
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    position: fixed;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    padding-top: 20px;
+}
+
+.sidebar .brand {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0 20px 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 10px;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.7);
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 4px 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    background: var(--sidebar-hover);
+    color: white;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.dashboard-content {
+    flex: 1;
+    margin-left: 260px;
+}
+
+.dashboard-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg);
+    transition: all 0.2s;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--sidebar-bg);
+}
+
+.stat-card .stat-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-card.bg-primary .stat-icon { background: #dbeafe; color: #2563eb; }
+.stat-card.bg-success .stat-icon { background: #dcfce7; color: #16a34a; }
+.stat-card.bg-info .stat-icon { background: #e0f2fe; color: #0284c7; }
+.stat-card.bg-warning .stat-icon { background: #fef3c7; color: #d97706; }
+.stat-card.bg-danger .stat-icon { background: #fee2e2; color: #dc2626; }
+
+/* Dashboard welcome */
+.dashboard-welcome {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-welcome h3 {
+    color: var(--sidebar-bg);
+    margin-bottom: 8px;
+}
+
+.dashboard-welcome p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Table improvements */
+.table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px 20px;
+    font-weight: 600;
+    color: var(--sidebar-bg);
+}
+
+.table-card .card-body {
+    padding: 0;
+}
+
+.table {
+    margin: 0;
+}
+
+.table th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: var(--sidebar-bg);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    color: #334155;
+}
+
+.table tr:hover td {
+    background: #f8fafc;
+}
+
+/* Status badges */
+.badge-pending { background: #fef3c7; color: #d97706; }
+.badge-active { background: #dcfce7; color: #16a34a; }
+.badge-rejected { background: #fee2e2; color: #dc2626; }
+.badge-accepted { background: #dbeafe; color: #2563eb; }
+
+/* Buttons */
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+    .dashboard-content {
+        margin-left: 0;
+    }
+    .sidebar {
+        transform: translateX(-100%);
+    }
+}

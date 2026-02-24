@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>Post Job</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-4" th:text="${jobId != null ? 'Edit Job' : 'Post New Job'}">Post Job</h2>
+    
+    <form th:action="@{${jobId != null ? '/recruiter/jobs/' + jobId + '/edit' : '/recruiter/jobs/create'}}" th:object="${jobDTO}" method="post">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Job Details</h5>
+                <div class="mb-3">
+                    <label class="form-label">Job Title</label>
+                    <input type="text" class="form-control" th:field="*{title}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" th:field="*{description}" rows="4"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Requirements</label>
+                    <textarea class="form-control" th:field="*{requirements}" rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" th:field="*{location}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" th:field="*{categoryId}">
+                            <option value="">Select Category</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Job Type</label>
+                        <select class="form-select" th:field="*{jobType}">
+                            <option value="">Select Type</option>
+                            <option value="FULL_TIME">Full Time</option>
+                            <option value="PART_TIME">Part Time</option>
+                            <option value="CONTRACT">Contract</option>
+                            <option value="INTERNSHIP">Internship</option>
+                            <option value="REMOTE">Remote</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Experience Level</label>
+                        <select class="form-select" th:field="*{experienceLevel}">
+                            <option value="">Select Level</option>
+                            <option value="ENTRY_LEVEL">Entry Level</option>
+                            <option value="MID_LEVEL">Mid Level</option>
+                            <option value="SENIOR">Senior</option>
+                            <option value="EXECUTIVE">Executive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Salary Min</label>
+                        <input type="number" class="form-control" th:field="*{salaryMin}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Salary Max</label>
+                        <input type="number" class="form-control" th:field="*{salaryMax}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" class="form-control" th:field="*{deadline}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Vacancies</label>
+                    <input type="number" class="form-control" th:field="*{vacancies}" value="1">
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" th:text="${jobId != null ? 'Update Job' : 'Post Job'}">Submit</button>
+    </form>
+</main>
+</body>
+</html>

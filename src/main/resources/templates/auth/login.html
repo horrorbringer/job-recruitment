@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Welcome Back</h2>
+                        
+                        <div th:if="${param.error}" class="alert alert-danger">
+                            <span th:if="${session.loginError}" th:text="${session.loginError}">Invalid email or password</span>
+                            <span th:unless="${session.loginError}">Invalid email or password</span>
+                        </div>
+                        
+                        <div th:if="${param.logout}" class="alert alert-success">
+                            You have been logged out
+                        </div>
+                        
+                        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                        
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="username" class="form-control" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                                <label class="form-check-label" for="remember-me">Remember me</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                        </form>
+                        
+                        <p class="text-center mb-0">
+                            Don't have an account? <a th:href="@{/register}">Register</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

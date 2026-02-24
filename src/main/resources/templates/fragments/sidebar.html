@@ -1,0 +1,77 @@
+<aside th:fragment="sidebar" class="sidebar">
+    <div class="brand">
+        <i class="bi bi-briefcase-fill me-2"></i>JobPortal
+    </div>
+    <ul class="nav flex-column mt-3">
+        <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
+            <a class="nav-link" th:href="@{/job-seeker/dashboard}">
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
+            <a class="nav-link" th:href="@{/job-seeker/profile}">
+                <i class="bi bi-person"></i>My Profile
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
+            <a class="nav-link" th:href="@{/job-seeker/applications}">
+                <i class="bi bi-file-earmark-text"></i>Applications
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
+            <a class="nav-link" th:href="@{/jobs}">
+                <i class="bi bi-search"></i>Find Jobs
+            </a>
+        </li>
+        
+        <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
+            <a class="nav-link" th:href="@{/recruiter/dashboard}">
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
+            <a class="nav-link" th:href="@{/recruiter/profile}">
+                <i class="bi bi-building"></i>Company Profile
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
+            <a class="nav-link" th:href="@{/recruiter/jobs}">
+                <i class="bi bi-briefcase"></i>Manage Jobs
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
+            <a class="nav-link" th:href="@{/recruiter/applications}">
+                <i class="bi bi-people"></i>Applications
+            </a>
+        </li>
+        
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link" th:href="@{/admin/dashboard}">
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link" th:href="@{/admin/users}">
+                <i class="bi bi-people"></i>Manage Users
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link" th:href="@{/admin/jobs}">
+                <i class="bi bi-briefcase"></i>Manage Jobs
+            </a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link" th:href="@{/admin/categories}">
+                <i class="bi bi-tags"></i>Categories
+            </a>
+        </li>
+    </ul>
+    
+    <div class="mt-auto p-3" style="border-top: 1px solid rgba(255,255,255,0.1);">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-light w-100">
+                <i class="bi bi-box-arrow-right me-2"></i>Logout
+            </button>
+        </form>
+    </div>
+</aside>

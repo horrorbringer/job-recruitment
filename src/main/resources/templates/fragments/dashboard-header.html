@@ -1,0 +1,49 @@
+<header th:fragment="header" class="bg-white shadow-sm p-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Dashboard</h4>
+        <div class="d-flex align-items-center">
+            <div class="dropdown me-3" sec:authorize="isAuthenticated()">
+                <button class="btn btn-link text-dark position-relative p-1" data-bs-toggle="dropdown">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span th:if="${unreadNotifications > 0}" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          th:text="${unreadNotifications}">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                        <h6 class="mb-0">Notifications</h6>
+                        <a th:href="@{/notifications/mark-all-read}" class="small text-decoration-none">Mark all read</a>
+                    </div>
+                    <div th:if="${#lists.isEmpty(notifications)}" class="p-3 text-center text-muted">
+                        No notifications
+                    </div>
+                    <a th:each="notif : ${notifications}" 
+                       th:href="@{${notif.link}}" 
+                       class="dropdown-item border-bottom"
+                       th:classappend="${!notif.isRead} ? 'bg-light' : ''">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-bell-fill me-2 mt-1"
+                               th:classappend="${notif.type == 'interview'} ? 'text-info' : 
+                                               (${notif.type == 'rejected'} ? 'text-danger' : 
+                                               (${notif.type == 'hired'} ? 'text-success' : 'text-primary'))"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-medium" th:text="${notif.title}">Title</div>
+                                <small class="text-muted" th:text="${notif.message}">Message</small>
+                                <br>
+                                <small class="text-muted" th:text="${#temporals.format(notif.createdAt, 'MMM dd, HH:mm')}">Time</small>
+                            </div>
+                            <span th:if="${!notif.isRead}" class="badge bg-primary rounded-circle" style="width: 8px; height: 8px;"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <span class="me-3" sec:authentication="name">User</span>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-sm btn-outline-danger" type="submit">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</header>

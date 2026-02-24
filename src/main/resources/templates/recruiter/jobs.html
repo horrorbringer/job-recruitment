@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>Manage Jobs</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="d-flex justify-content-between mb-4">
+        <h2>Manage Jobs</h2>
+        <a th:href="@{/recruiter/jobs/create}" class="btn btn-primary">Post New Job</a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Applications</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="job : ${jobs}">
+                        <td th:text="${job.title}">Title</td>
+                        <td th:text="${job.location}">Location</td>
+                        <td>
+                            <span class="badge" th:classappend="${job.status == 'APPROVED' ? 'bg-success' : 
+                                (job.status == 'PENDING' ? 'bg-warning' : 'bg-secondary')}" 
+                                th:text="${job.status}">Status</span>
+                        </td>
+                        <td th:text="${job.applications?.size()}">0</td>
+                        <td>
+                            <a th:href="@{/recruiter/jobs/{id}/applications(id=${job.id})}" class="btn btn-sm btn-info">View</a>
+                            <a th:href="@{/recruiter/jobs/{id}/edit(id=${job.id})}" class="btn btn-sm btn-warning">Edit</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div th:if="${jobs.empty}" class="text-center py-4">
+                <p class="text-muted">No jobs posted yet</p>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

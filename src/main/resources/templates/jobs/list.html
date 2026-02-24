@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Browse Jobs</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-5">
+        <h2 class="mb-4">All Jobs</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
+                <div class="card h-100 job-card hover-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none">Job Title</a>
+                        </h5>
+                        <p class="text-muted" th:text="${job.recruiter?.companyName}">Company</p>
+                        <div class="mb-2">
+                            <span class="badge bg-light text-dark me-1">
+                                <i class="bi bi-geo-alt me-1"></i><span th:text="${job.location}">Location</span>
+                            </span>
+                            <span class="badge bg-primary" th:text="${job.jobType}">Type</span>
+                        </div>
+                        <p class="card-text text-truncate" th:text="${job.description}">Description...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${jobs.empty}" class="text-center py-5">
+            <p class="text-muted">No jobs found</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Find Your Dream Job</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="hero-section py-5 bg-primary text-white">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Find Your Dream Job Today</h1>
+                    <p class="lead mb-4">Connect with top employers and discover opportunities that match your skills and ambitions.</p>
+                    
+                    <form th:action="@{/jobs/search}" method="get" class="bg-white p-3 rounded shadow">
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <input type="text" class="form-control form-control-lg" name="keyword" placeholder="Job title or keyword">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control form-control-lg" name="location" placeholder="Location">
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-search me-1"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block text-center">
+                    <i class="bi bi-briefcase display-1"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Browse by Category</h2>
+            <div class="row g-4">
+                <div class="col-md-3" th:each="category : ${categories}">
+                    <a th:href="@{/jobs/search(categoryId=${category.id})}" class="text-decoration-none">
+                        <div class="card h-100 category-card hover-shadow">
+                            <div class="card-body text-center">
+                                <i class="bi bi-briefcase display-4 text-primary mb-3"></i>
+                                <h5 th:text="${category.name}">Category Name</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Recent Jobs</h2>
+                <a th:href="@{/jobs}" class="btn btn-outline-primary">View All</a>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
+                    <div class="card h-100 job-card hover-shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none">Job Title</a>
+                            </h5>
+                            <p class="text-muted" th:text="${job.recruiter?.companyName}">Company</p>
+                            <div class="mb-2">
+                                <span class="badge bg-light text-dark me-1">
+                                    <i class="bi bi-geo-alt me-1"></i><span th:text="${job.location}">Location</span>
+                                </span>
+                            </div>
+                            <p class="card-text text-truncate" th:text="${job.description}">Description...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

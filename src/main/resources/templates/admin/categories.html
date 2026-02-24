@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>Manage Categories</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-4">Manage Categories</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/admin/categories}" method="post" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="name" class="form-control" placeholder="Category Name" required>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="description" class="form-control" placeholder="Description">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cat : ${categories}">
+                        <td th:text="${cat.name}">Name</td>
+                        <td th:text="${cat.description}">Description</td>
+                        <td>
+                            <span class="badge" th:classappend="${cat.active ? 'bg-success' : 'bg-secondary'}" th:text="${cat.active ? 'Active' : 'Inactive'}">Status</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/categories/{id}/delete(id=${cat.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>
