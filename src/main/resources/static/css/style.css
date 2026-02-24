@@ -225,3 +225,13 @@
         transform: translateX(-100%);
     }
 }
+
+/* Icon Circle */
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
