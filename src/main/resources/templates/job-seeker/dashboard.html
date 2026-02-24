@@ -15,53 +15,61 @@
     <!-- Stats Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="card bg-primary text-white">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="text-white-50 small">Total Applications</div>
-                            <div class="fs-4 fw-bold" th:text="${applicationCount}">0</div>
+                            <div class="text-muted small">Total Applications</div>
+                            <div class="fs-4 fw-bold text-primary" th:text="${applicationCount}">0</div>
                         </div>
-                        <i class="bi bi-file-earmark-text fs-1 opacity-50"></i>
+                        <div class="icon-circle bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-file-earmark-text fs-5"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="text-white-50 small">Interviews</div>
-                            <div class="fs-4 fw-bold" th:text="${interviewCount ?: 0}">0</div>
+                            <div class="text-muted small">Interviews</div>
+                            <div class="fs-4 fw-bold text-success" th:text="${interviewCount ?: 0}">0</div>
                         </div>
-                        <i class="bi bi-calendar-check fs-1 opacity-50"></i>
+                        <div class="icon-circle bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-calendar-check fs-5"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="text-white-50 small">Shortlisted</div>
-                            <div class="fs-4 fw-bold" th:text="${shortlistedCount ?: 0}">0</div>
+                            <div class="text-muted small">Shortlisted</div>
+                            <div class="fs-4 fw-bold text-warning" th:text="${shortlistedCount ?: 0}">0</div>
                         </div>
-                        <i class="bi bi-check2-square fs-1 opacity-50"></i>
+                        <div class="icon-circle bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-check2-square fs-5"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <div class="text-white-50 small">Profile Views</div>
-                            <div class="fs-4 fw-bold" th:text="${profileViews ?: 0}">0</div>
+                            <div class="text-muted small">Profile Views</div>
+                            <div class="fs-4 fw-bold text-info" th:text="${profileViews ?: 0}">0</div>
                         </div>
-                        <i class="bi bi-eye fs-1 opacity-50"></i>
+                        <div class="icon-circle bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-eye fs-5"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,31 +80,37 @@
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-search text-primary" style="font-size: 2.5rem;"></i>
-                    <h5 class="mt-3">Find Jobs</h5>
-                    <p class="text-muted small">Browse and apply for new opportunities</p>
-                    <a th:href="@{/jobs}" class="btn btn-primary">Browse Jobs</a>
+                <div class="card-body text-center py-4">
+                    <div class="icon-circle bg-primary bg-opacity-10 text-primary mb-3">
+                        <i class="bi bi-search fs-4"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-2">Find Jobs</h6>
+                    <p class="text-muted small mb-3">Browse and apply for new opportunities</p>
+                    <a th:href="@{/jobs}" class="btn btn-primary btn-sm">Browse Jobs</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-person-circle text-success" style="font-size: 2.5rem;"></i>
-                    <h5 class="mt-3">Your Profile</h5>
-                    <p class="text-muted small" th:text="${profile} ? 'Manage your profile information' : 'Complete your profile'">Profile</p>
-                    <a th:href="@{/job-seeker/profile}" class="btn btn-success" th:text="${profile} ? 'Edit Profile' : 'Complete Profile'">Profile</a>
+                <div class="card-body text-center py-4">
+                    <div class="icon-circle bg-success bg-opacity-10 text-success mb-3">
+                        <i class="bi bi-person-circle fs-4"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-2">Your Profile</h6>
+                    <p class="text-muted small mb-3" th:text="${profile} ? 'Manage your profile information' : 'Complete your profile'">Profile</p>
+                    <a th:href="@{/job-seeker/profile}" class="btn btn-success btn-sm" th:text="${profile} ? 'Edit Profile' : 'Complete Profile'">Profile</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-file-earmark-text text-warning" style="font-size: 2.5rem;"></i>
-                    <h5 class="mt-3">Applications</h5>
-                    <p class="text-muted small">Track your job applications</p>
-                    <a th:href="@{/job-seeker/applications}" class="btn btn-warning">View All</a>
+                <div class="card-body text-center py-4">
+                    <div class="icon-circle bg-warning bg-opacity-10 text-warning mb-3">
+                        <i class="bi bi-file-earmark-text fs-4"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-2">Applications</h6>
+                    <p class="text-muted small mb-3">Track your job applications</p>
+                    <a th:href="@{/job-seeker/applications}" class="btn btn-warning btn-sm">View All</a>
                 </div>
             </div>
         </div>
@@ -105,83 +119,97 @@
     <!-- Profile & Applications -->
     <div class="row g-4">
         <div class="col-md-5">
-            <div class="card table-card">
-                <div class="card-header">
-                    <i class="bi bi-person-circle me-2"></i>Your Profile
-                    <a th:href="@{/job-seeker/profile}" class="btn btn-sm btn-outline-primary float-end">Edit</a>
-                </div>
-                <div class="card-body" th:if="${profile}">
-                    <div class="text-center mb-3">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-2">
-                            <i class="bi bi-person-fill text-primary" style="font-size: 2rem;"></i>
-                        </div>
-                        <h5 class="mb-1" th:text="${profile.fullName}">Name</h5>
-                        <p class="text-muted mb-1 small" th:text="${profile.user?.email}">email</p>
-                        <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i><span th:text="${profile.location}">Location</span></p>
+            <div class="card table-card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold"><i class="bi bi-person-circle me-2"></i>Your Profile</span>
+                        <a th:href="@{/job-seeker/profile}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </a>
                     </div>
-                    <hr>
-                    <div class="row text-center">
-                        <div class="col-6">
+                </div>
+                <div class="card-body p-4" th:if="${profile}">
+                    <div class="text-center pb-4 border-bottom mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="bi bi-person-fill text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h5 class="mb-1 fw-bold" th:text="${profile.fullName}">Name</h5>
+                        <p class="text-muted mb-1 small" th:text="${profile.user?.email}">email</p>
+                        <p class="text-muted small mb-0" th:if="${profile.location}"><i class="bi bi-geo-alt me-1"></i><span th:text="${profile.location}">Location</span></p>
+                    </div>
+                    <div class="row text-center py-3">
+                        <div class="col-6 border-end">
                             <div class="text-muted small">Experience</div>
-                            <div class="fw-bold" th:text="${profile.experienceYears + ' years'}">0 years</div>
+                            <div class="fw-bold" th:text="${profile.experienceYears != null ? profile.experienceYears + ' years' : 'Not set'}">0 years</div>
                         </div>
                         <div class="col-6">
                             <div class="text-muted small">Level</div>
-                            <div class="fw-bold" th:text="${profile.experienceLevel}">Junior</div>
+                            <div class="fw-bold" th:text="${profile.experienceLevel != null ? profile.experienceLevel.name().replace('_', ' ') : 'Not set'}">Junior</div>
                         </div>
                     </div>
-                    <hr>
-                    <div class="mb-0">
+                    <div class="pt-3 border-top">
                         <div class="text-muted small mb-2">Skills</div>
-                        <div>
+                        <div th:if="${profile.skills}">
                             <span th:each="skill : ${#strings.arraySplit(profile.skills, ',')}" 
                                   class="badge bg-light text-dark me-1 mb-1" th:text="${skill.trim()}">Skill</span>
                         </div>
+                        <p th:if="${!profile.skills}" class="text-muted small mb-0">No skills added</p>
                     </div>
                 </div>
-                <div class="card-body text-center py-4" th:unless="${profile}">
-                    <i class="bi bi-person-plus text-muted" style="font-size: 2.5rem;"></i>
-                    <p class="text-muted mt-2">Complete your profile to start applying</p>
-                    <a th:href="@{/job-seeker/profile}" class="btn btn-primary">Complete Profile</a>
+                <div class="card-body text-center py-5" th:unless="${profile}">
+                    <div class="mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4">
+                            <i class="bi bi-person-plus text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h6 class="fw-semibold mb-2">Complete Your Profile</h6>
+                    <p class="text-muted small mb-3">Add your details to start applying for jobs.</p>
+                    <a th:href="@{/job-seeker/profile}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Complete Profile
+                    </a>
                 </div>
             </div>
         </div>
         <div class="col-md-7">
-            <div class="card table-card">
-                <div class="card-header">
-                    <i class="bi bi-clock-history me-2"></i>Recent Applications
-                    <a th:href="@{/job-seeker/applications}" class="btn btn-sm btn-outline-primary float-end">View All</a>
+            <div class="card table-card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Applications</span>
+                        <a th:href="@{/job-seeker/applications}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0" th:if="${not #lists.isEmpty(recentApplications)}">
-                        <thead>
-                            <tr>
-                                <th>Job</th>
-                                <th>Company</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="app : ${recentApplications}">
-                                <td>
-                                    <a th:href="@{/jobs/{id}(id=${app.job.id})}" 
-                                       th:text="${app.job.title}" class="text-decoration-none fw-medium">Job Title</a>
-                                </td>
-                                <td class="text-muted" th:text="${app.job?.recruiter?.companyName}">Company</td>
-                                <td>
-                                    <span class="badge" th:classappend="${app.status.name() == 'APPLIED'} ? 'bg-primary' : 
-                                        (${app.status.name() == 'VIEWED'} ? 'bg-info' : 
-                                        (${app.status.name() == 'SHORTLISTED'} ? 'bg-success' : 
-                                        (${app.status.name() == 'INTERVIEW_SCHEDULED'} ? 'bg-warning' : 
-                                        (${app.status.name() == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))))" 
-                                        th:text="${app.status.name().replace('_', ' ')}">Status</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="text-center py-4 text-muted" th:if="${#lists.isEmpty(recentApplications)}">
-                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                        <p class="mt-2 mb-2">No applications yet</p>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" th:if="${not #lists.isEmpty(recentApplications)}">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4 py-3">Job</th>
+                                    <th class="py-3">Company</th>
+                                    <th class="py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="app : ${recentApplications}">
+                                    <td class="px-4 py-3">
+                                        <a th:href="@{/jobs/{id}(id=${app.job.id})}" 
+                                           th:text="${app.job.title}" class="text-decoration-none fw-medium">Job Title</a>
+                                    </td>
+                                    <td class="text-muted py-3" th:text="${app.job?.recruiter?.companyName}">Company</td>
+                                    <td class="py-3">
+                                        <span class="badge" th:classappend="${app.status.name() == 'APPLIED'} ? 'bg-primary' : 
+                                            (${app.status.name() == 'VIEWED'} ? 'bg-info' : 
+                                            (${app.status.name() == 'SHORTLISTED'} ? 'bg-success' : 
+                                            (${app.status.name() == 'INTERVIEW_SCHEDULED'} ? 'bg-warning' : 
+                                            (${app.status.name() == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))))" 
+                                            th:text="${app.status.name().replace('_', ' ')}">Status</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center py-5 text-muted" th:if="${#lists.isEmpty(recentApplications)}">
+                        <i class="bi bi-inbox" style="font-size: 2.5rem;"></i>
+                        <p class="mt-3 mb-3">No applications yet</p>
                         <a th:href="@{/jobs}" class="btn btn-outline-primary btn-sm">Find Jobs</a>
                     </div>
                 </div>
