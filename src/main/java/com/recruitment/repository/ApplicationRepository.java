@@ -32,4 +32,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @Query("SELECT a FROM Application a WHERE a.job.recruiter.id = :recruiterId ORDER BY a.createdAt DESC")
     Page<Application> findByJobRecruiterId(@Param("recruiterId") Long recruiterId, Pageable pageable);
+
+    @Query("SELECT COUNT(a) FROM Application a WHERE a.jobSeeker.id = :jobSeekerId AND a.status = :status")
+    long countByJobSeekerIdAndStatus(@Param("jobSeekerId") Long jobSeekerId, @Param("status") Application.Status status);
 }

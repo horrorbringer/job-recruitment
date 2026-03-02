@@ -40,6 +40,14 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     
     List<Job> findByDeadlineBeforeAndStatusNot(LocalDate date, Job.Status status);
 
+    @Query(value = "SELECT * FROM jobs WHERE status = 'APPROVED' AND " +
+           "(title ~* :skillRegex OR description ~* :skillRegex OR requirements ~* :skillRegex) " +
+           "ORDER BY created_at DESC", 
+           countQuery = "SELECT count(*) FROM jobs WHERE status = 'APPROVED' AND " +
+           "(title ~* :skillRegex OR description ~* :skillRegex OR requirements ~* :skillRegex)",
+           nativeQuery = true)
+    Page<Job> findBySkillsRegex(@Param("skillRegex") String skillRegex, Pageable pageable);
+
     @Query("SELECT COUNT(j) FROM Job j WHERE j.recruiter.id = :recruiterId")
     long countByRecruiterId(@Param("recruiterId") Long recruiterId);
 }

@@ -5,7 +5,9 @@ import com.recruitment.model.User;
 import com.recruitment.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +23,10 @@ public class NotificationService {
 
     public Page<Notification> getNotifications(Long userId, Pageable pageable) {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+    }
+
+    public List<Notification> getLatestNotifications(Long userId, int limit) {
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, limit)).getContent();
     }
 
     public long getUnreadCount(Long userId) {

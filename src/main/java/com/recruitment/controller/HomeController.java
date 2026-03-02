@@ -55,6 +55,9 @@ public class HomeController {
         if (userDetails != null) {
             var user = userService.findByEmail(userDetails.getUsername());
             if (user != null) {
+                boolean isJobSeeker = user.getRole() == com.recruitment.model.User.Role.JOB_SEEKER;
+                model.addAttribute("isJobSeeker", isJobSeeker);
+                
                 var profile = jobSeekerService.getProfile(user.getId());
                 if (profile != null) {
                     boolean alreadyApplied = applicationService.hasApplied(profile.getId(), id);

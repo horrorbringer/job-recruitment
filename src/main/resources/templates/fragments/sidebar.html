@@ -1,124 +1,143 @@
-<aside th:fragment="sidebar" class="sidebar" id="sidebar">
-    <button class="sidebar-toggle" id="sidebarToggle">
+<aside th:fragment="sidebar" class="sidebar" id="sidebar" data-collapsed="false">
+    <button type="button" class="sidebar-toggle" id="sidebarToggle">
         <i class="bi bi-chevron-left"></i>
     </button>
     
-    <div class="brand d-flex align-items-center">
-        <i class="bi bi-briefcase-fill me-2"></i>
+    <div class="brand">
+        <i class="bi bi-briefcase-fill"></i>
         <span class="brand-text">JobPortal</span>
     </div>
     
-    <div class="user-info px-3 py-3" sec:authorize="isAuthenticated()">
-        <div class="d-flex align-items-center">
-            <div class="user-avatar rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center">
-                <i class="bi bi-person-fill text-primary"></i>
-            </div>
-            <div class="user-details ms-2">
-                <div class="user-name" sec:authentication="name">User</div>
-                <div class="user-role text-white-50 small" sec:authorize="hasRole('JOB_SEEKER')">Job Seeker</div>
-                <div class="user-role text-white-50 small" sec:authorize="hasRole('RECRUITER')">Recruiter</div>
-                <div class="user-role text-white-50 small" sec:authorize="hasRole('ADMIN')">Admin</div>
-            </div>
+    <div class="user-info" sec:authorize="isAuthenticated()">
+        <div class="user-avatar">
+            <i class="bi bi-person-fill"></i>
+        </div>
+        <div class="user-details">
+            <div class="user-name" sec:authentication="name">User</div>
+            <div class="user-role" sec:authorize="hasRole('JOB_SEEKER')">Job Seeker</div>
+            <div class="user-role" sec:authorize="hasRole('RECRUITER')">Recruiter</div>
+            <div class="user-role" sec:authorize="hasRole('ADMIN')">Admin</div>
         </div>
     </div>
     
     <div class="sidebar-menu">
-        <ul class="nav flex-column mt-2">
+        <ul class="nav flex-column">
             <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
-                <a class="nav-link" th:href="@{/job-seeker/dashboard}">
-                    <i class="bi bi-speedometer2"></i><span class="nav-text">Dashboard</span>
+                <a class="nav-link" th:href="@{/job-seeker/dashboard}" data-title="Dashboard">
+                    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
-                <a class="nav-link" th:href="@{/job-seeker/profile}">
-                    <i class="bi bi-person"></i><span class="nav-text">My Profile</span>
+                <a class="nav-link" th:href="@{/job-seeker/profile}" data-title="My Profile">
+                    <i class="bi bi-person"></i><span>My Profile</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
-                <a class="nav-link" th:href="@{/job-seeker/applications}">
-                    <i class="bi bi-file-earmark-text"></i><span class="nav-text">Applications</span>
+                <a class="nav-link" th:href="@{/job-seeker/applications}" data-title="Applications">
+                    <i class="bi bi-file-earmark-text"></i><span>Applications</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
-                <a class="nav-link" th:href="@{/jobs}">
-                    <i class="bi bi-search"></i><span class="nav-text">Find Jobs</span>
+                <a class="nav-link" th:href="@{/jobs}" data-title="Find Jobs">
+                    <i class="bi bi-search"></i><span>Find Jobs</span>
                 </a>
             </li>
             
             <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
-                <a class="nav-link" th:href="@{/recruiter/dashboard}">
-                    <i class="bi bi-speedometer2"></i><span class="nav-text">Dashboard</span>
+                <a class="nav-link" th:href="@{/recruiter/dashboard}" data-title="Dashboard">
+                    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
-                <a class="nav-link" th:href="@{/recruiter/profile}">
-                    <i class="bi bi-building"></i><span class="nav-text">Company Profile</span>
+                <a class="nav-link" th:href="@{/recruiter/profile}" data-title="Company Profile">
+                    <i class="bi bi-building"></i><span>Company Profile</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
-                <a class="nav-link" th:href="@{/recruiter/jobs}">
-                    <i class="bi bi-briefcase"></i><span class="nav-text">Manage Jobs</span>
+                <a class="nav-link" th:href="@{/recruiter/jobs}" data-title="Manage Jobs">
+                    <i class="bi bi-briefcase"></i><span>Manage Jobs</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
-                <a class="nav-link" th:href="@{/recruiter/applications}">
-                    <i class="bi bi-people"></i><span class="nav-text">Applications</span>
+                <a class="nav-link" th:href="@{/recruiter/applications}" data-title="Applications">
+                    <i class="bi bi-people"></i><span>Applications</span>
                 </a>
             </li>
             
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link" th:href="@{/admin/dashboard}">
-                    <i class="bi bi-speedometer2"></i><span class="nav-text">Dashboard</span>
+                <a class="nav-link" th:href="@{/admin/dashboard}" data-title="Dashboard">
+                    <i class="bi bi-speedometer2"></i><span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link" th:href="@{/admin/users}">
-                    <i class="bi bi-people"></i><span class="nav-text">Manage Users</span>
+                <a class="nav-link" th:href="@{/admin/users}" data-title="Manage Users">
+                    <i class="bi bi-people"></i><span>Manage Users</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link" th:href="@{/admin/jobs}">
-                    <i class="bi bi-briefcase"></i><span class="nav-text">Manage Jobs</span>
+                <a class="nav-link" th:href="@{/admin/jobs}" data-title="Manage Jobs">
+                    <i class="bi bi-briefcase"></i><span>Manage Jobs</span>
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link" th:href="@{/admin/categories}">
-                    <i class="bi bi-tags"></i><span class="nav-text">Categories</span>
+                <a class="nav-link" th:href="@{/admin/categories}" data-title="Categories">
+                    <i class="bi bi-tags"></i><span>Categories</span>
                 </a>
             </li>
         </ul>
     </div>
     
-    <div class="mt-auto p-3 sidebar-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
+    <div class="sidebar-footer">
         <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outline-light w-100 d-flex align-items-center justify-content-center">
-                <i class="bi bi-box-arrow-right me-2"></i><span class="nav-text">Logout</span>
+            <button type="submit" class="btn btn-outline-light w-100">
+                <i class="bi bi-box-arrow-right"></i><span>Logout</span>
             </button>
         </form>
     </div>
 </aside>
 
 <script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('sidebarToggle');
-        
-        // Set active nav link
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            if(link.getAttribute('href') === currentPath) {
-                link.classList.add('active');
-            }
-        });
-        
-        // Check saved state
-        if(localStorage.getItem('sidebarCollapsed') === 'true') {
-            sidebar.classList.add('collapsed');
+(function() {
+    var sidebar = document.getElementById('sidebar');
+    var toggleBtn = document.getElementById('sidebarToggle');
+    
+    if (!sidebar || !toggleBtn) return;
+    
+    // Initialize collapsed state from localStorage
+    var savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState === 'true') {
+        sidebar.classList.add('collapsed');
+        sidebar.setAttribute('data-collapsed', 'true');
+        updateIcon(true);
+    }
+    
+    // Set active nav link
+    var currentPath = window.location.pathname;
+    var navLinks = sidebar.querySelectorAll('.nav-link');
+    for (var i = 0; i < navLinks.length; i++) {
+        if (navLinks[i].getAttribute('href') === currentPath) {
+            navLinks[i].classList.add('active');
+            break;
         }
-        
-        toggleBtn.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-        });
-    });
+    }
+    
+    // Toggle click handler - use direct event
+    toggleBtn.onclick = function() {
+        var isCollapsed = sidebar.classList.toggle('collapsed');
+        sidebar.setAttribute('data-collapsed', isCollapsed);
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+        updateIcon(isCollapsed);
+    };
+    
+    function updateIcon(isCollapsed) {
+        var icon = toggleBtn.querySelector('i');
+        if (icon) {
+            if (isCollapsed) {
+                icon.className = 'bi bi-chevron-right';
+            } else {
+                icon.className = 'bi bi-chevron-left';
+            }
+        }
+    }
+})();
 </script>

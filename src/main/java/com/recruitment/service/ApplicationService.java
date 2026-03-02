@@ -167,4 +167,13 @@ public class ApplicationService {
     public Page<Application> getByRecruiterId(Long recruiterId, Pageable pageable) {
         return applicationRepository.findByJobRecruiterId(recruiterId, pageable);
     }
+
+    public List<Application> getRecentApplications(Long jobSeekerId, int limit) {
+        return applicationRepository.findByJobSeekerIdOrderByCreatedAtDesc(jobSeekerId)
+            .stream().limit(limit).toList();
+    }
+
+    public long countByJobSeekerIdAndStatus(Long jobSeekerId, Application.Status status) {
+        return applicationRepository.countByJobSeekerIdAndStatus(jobSeekerId, status);
+    }
 }

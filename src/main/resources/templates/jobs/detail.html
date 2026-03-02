@@ -1,82 +1,124 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main}">
-<head>
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/main}"
+>
+  <head>
     <title>Job Details</title>
-</head>
-<body>
-<main layout:fragment="content">
-    <div class="container py-5">
+  </head>
+  <body>
+    <main layout:fragment="content">
+      <div class="container py-5">
         <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 th:text="${job.title}">Job Title</h2>
-                        <h5 class="text-muted" th:text="${job.recruiter?.companyName}">Company</h5>
-                        
-                        <div class="my-3">
-                            <span class="badge bg-light text-dark me-2">
-                                <i class="bi bi-geo-alt me-1"></i><span th:text="${job.location}">Location</span>
-                            </span>
-                            <span class="badge bg-primary me-2" th:text="${job.jobType}">Type</span>
-                            <span class="badge bg-success" th:if="${job.salaryMin}" th:text="${'$' + job.salaryMin + ' - $' + job.salaryMax}">Salary</span>
-                        </div>
-                        
-                        <hr>
-                        
-                        <h4>Description</h4>
-                        <p th:text="${job.description}">Description</p>
-                        
-                        <h4 class="mt-4">Requirements</h4>
-                        <p th:text="${job.requirements}">Requirements</p>
-                        
-                        <div class="mt-4">
-                            <span th:if="${job.deadline}">
-                                <strong>Deadline:</strong> <span th:text="${job.deadline}">Deadline</span>
-                            </span>
-                        </div>
-                    </div>
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <h2 th:text="${job.title}">Job Title</h2>
+                <h5 class="text-muted" th:text="${job.recruiter?.companyName}">
+                  Company
+                </h5>
+
+                <div class="my-3">
+                  <span class="badge bg-light text-dark me-2">
+                    <i class="bi bi-geo-alt me-1"></i
+                    ><span th:text="${job.location}">Location</span>
+                  </span>
+                  <span class="badge bg-primary me-2" th:text="${job.jobType}"
+                    >Type</span
+                  >
+                  <span
+                    class="badge bg-success"
+                    th:if="${job.salaryMin}"
+                    th:text="${'$' + job.salaryMin + ' - $' + job.salaryMax}"
+                    >Salary</span
+                  >
                 </div>
-            </div>
-            
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Apply for this job</h5>
-                        
-                        <div th:if="${param.error}" class="alert alert-danger">
-                            <span th:text="${param.error}">Error message</span>
-                        </div>
-                        
-                        <div th:if="${param.success}" class="alert alert-success">
-                            Application submitted successfully!
-                        </div>
-                        
-                        <div th:if="${alreadyApplied}" class="alert alert-info">
-                            You have already applied for this job.
-                        </div>
-                        
-                        <div th:if="${#authorization.expression('isAuthenticated()')}">
-                            <form th:action="@{/job-seeker/apply/{id}(id=${job.id})}" method="post">
-                                <div class="mb-3">
-                                    <label for="coverLetter" class="form-label">Cover Letter</label>
-                                    <textarea class="form-control" id="coverLetter" name="coverLetter" rows="5" 
-                                              placeholder="Tell us why you're a great fit for this position..."></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Submit Application</button>
-                            </form>
-                        </div>
-                        
-                        <div th:unless="${#authorization.expression('isAuthenticated()')}">
-                            <a th:href="@{/login}" class="btn btn-primary w-100">Login to Apply</a>
-                            <p class="text-muted mt-2 small">Don't have an account? <a th:href="@{/register}">Register here</a></p>
-                        </div>
-                    </div>
+
+                <hr />
+
+                <h4>Description</h4>
+                <p th:text="${job.description}">Description</p>
+
+                <h4 class="mt-4">Requirements</h4>
+                <p th:text="${job.requirements}">Requirements</p>
+
+                <div class="mt-4">
+                  <span th:if="${job.deadline}">
+                    <strong>Deadline:</strong>
+                    <span th:text="${job.deadline}">Deadline</span>
+                  </span>
                 </div>
+              </div>
             </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Apply for this job</h5>
+
+                <div th:if="${param.error}" class="alert alert-danger">
+                  <span th:text="${param.error}">Error message</span>
+                </div>
+
+                <div th:if="${success}" class="alert alert-success">
+                  Application submitted successfully!
+                </div>
+
+                <div th:if="${alreadyApplied}" class="alert alert-info py-2">
+                  <i class="bi bi-info-circle me-1"></i> You have already
+                  applied for this job.
+                </div>
+
+                <div th:if="${isJobSeeker}">
+                  <div th:unless="${alreadyApplied}">
+                    <form
+                      th:action="@{/job-seeker/apply/{id}(id=${job.id})}"
+                      method="post"
+                    >
+                      <div class="mb-3">
+                        <label for="coverLetter" class="form-label"
+                          >Cover Letter</label
+                        >
+                        <textarea
+                          class="form-control"
+                          id="coverLetter"
+                          name="coverLetter"
+                          rows="5"
+                          placeholder="Tell us why you're a great fit for this position..."
+                        ></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100">
+                        Submit Application
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+                <div
+                  th:if="${#authorization.expression('isAuthenticated()') && !isJobSeeker}"
+                  class="alert alert-warning small py-2"
+                >
+                  Only job seekers can apply for jobs.
+                </div>
+
+                <div
+                  th:unless="${#authorization.expression('isAuthenticated()')}"
+                >
+                  <a th:href="@{/login}" class="btn btn-primary w-100"
+                    >Login to Apply</a
+                  >
+                  <p class="text-muted mt-2 small">
+                    Don't have an account?
+                    <a th:href="@{/register}">Register here</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</main>
-</body>
+      </div>
+    </main>
+  </body>
 </html>

@@ -5,6 +5,7 @@ import com.recruitment.model.*;
 import com.recruitment.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ public class JobSeekerController {
     private final JobSeekerService jobSeekerService;
     private final ApplicationService applicationService;
     private final UserService userService;
+    private final JobService jobService;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -31,6 +33,17 @@ public class JobSeekerController {
         model.addAttribute("profile", profile);
         if (profile != null) {
             model.addAttribute("applicationCount", applicationService.countByJobSeekerId(profile.getId()));
+            model.addAttribute("recentApplications", applicationService.getRecentApplications(profile.getId(), 5));
+            model.addAttribute("recommendedJobs", jobService.getRecommendedJobs(profile.getSkills(), PageRequest.of(0, 5)).getContent());
+            model.addAttribute("interviewCount", applicationService.countByJobSeekerIdAndStatus(profile.getId(), Application.Status.INTERVIEW_SCHEDULED));
+            model.addAttribute("shortlistedCount", applicationService.countByJobSeekerIdAndStatus(profile.getId(), Application.Status.SHORTLISTED));
+            model.addAttribute("profileViews", 0);
+        } else {
+            model.addAttribute("applicationCount", 0);
+            model.addAttribute("recentApplications", java.util.Collections.emptyList());
+            model.addAttribute("interviewCount", 0);
+            model.addAttribute("shortlistedCount", 0);
+            model.addAttribute("profileViews", 0);
         }
         
         return "job-seeker/dashboard";
@@ -129,6 +142,11 @@ public class JobSeekerController {
         }
         
         return "job-seeker/applications";
+    }
+
+    @GetMapping("/apply/{jobId}")
+    public String apply(@PathVariable Long jobId) {
+        return "redirect:/jobs/" + jobId;
     }
 
     @PostMapping("/apply/{jobId}")

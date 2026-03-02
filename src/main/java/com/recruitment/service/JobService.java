@@ -119,4 +119,23 @@ public class JobService {
     public long countByRecruiterId(Long recruiterId) {
         return jobRepository.countByRecruiterId(recruiterId);
     }
+
+    public Page<Job> getRecommendedJobs(String skills, Pageable pageable) {
+        if (skills == null || skills.trim().isEmpty()) {
+            return new PageImpl<>(java.util.Collections.emptyList(), pageable, 0);
+        }
+        
+        // Convert comma-separated skills to regex: "java, spring" -> "(java|spring)"
+        String[] skillArray = skills.split(",");
+        StringBuilder regexBuilder = new StringBuilder("(");
+        for (int i = 0; i < skillArray.length; i++) {
+            regexBuilder.append(skillArray[i].trim().replaceAll("[^a-zA-Z0-9#+]", ""));
+            if (i < skillArray.length - 1) {
+                regexBuilder.append("|");
+            }
+        }
+        regexBuilder.append(")");
+        
+        return jobRepository.findBySkillsRegex(regexBuilder.toString(), pageable);
+    }
 }
