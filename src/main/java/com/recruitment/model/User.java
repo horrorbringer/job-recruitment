@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class User extends BaseEntity {
-    
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -22,11 +22,11 @@ public class User extends BaseEntity {
     private Role role;
 
     private boolean enabled;
-    
+
     private boolean accountNonLocked;
 
     private int failedLoginAttempts = 0;
-    
+
     private LocalDateTime lockedUntil;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -65,6 +65,16 @@ public class User extends BaseEntity {
         this.accountNonLocked = true;
         this.lockedUntil = null;
         this.failedLoginAttempts = 0;
+    }
+
+    public String getFullName() {
+        if (jobSeeker != null) {
+            return jobSeeker.getFullName();
+        }
+        if (recruiter != null) {
+            return recruiter.getCompanyName();
+        }
+        return email; // Fallback to email for admins or users without profiles
     }
 
     public enum Role {

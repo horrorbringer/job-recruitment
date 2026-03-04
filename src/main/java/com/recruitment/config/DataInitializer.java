@@ -28,24 +28,26 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (userRepository.count() == 0) {
             initializeData();
-        } else if (jobRepository.count() == 0) {
+        } else if (jobRepository.findByTitleContaining("Senior Full Stack Engineer").isEmpty()) {
             seedExistingData();
         }
     }
 
     private void seedExistingData() {
         log.info("Seeding jobs for existing data...");
-        
+
         var recruiterUserOpt = userRepository.findByEmail("recruiter@company.com");
-        if (recruiterUserOpt.isEmpty()) return;
-        
+        if (recruiterUserOpt.isEmpty())
+            return;
+
         var recruiterOpt = recruiterRepository.findByUserId(recruiterUserOpt.get().getId());
-        if (recruiterOpt.isEmpty()) return;
-        
+        if (recruiterOpt.isEmpty())
+            return;
+
         var recruiter = recruiterOpt.get();
         var categories = categoryRepository.findAll();
         seedJobs(recruiter, categories);
-        
+
         log.info("Jobs seeded successfully!");
     }
 
@@ -57,17 +59,18 @@ public class DataInitializer implements CommandLineRunner {
         userRepository.save(admin);
 
         String[] categories = {
-            "Information Technology", "Marketing", "Finance", "Healthcare",
-            "Education", "Engineering", "Sales", "Design", "Human Resources", "Legal"
+                "Information Technology", "Marketing", "Finance", "Healthcare",
+                "Education", "Engineering", "Sales", "Design", "Human Resources", "Legal"
         };
-        
+
         List<Category> savedCategories = new java.util.ArrayList<>();
         for (String cat : categories) {
             Category category = new Category(cat);
             savedCategories.add(categoryRepository.save(category));
         }
 
-        User recruiterUser = new User("recruiter@company.com", passwordEncoder.encode("recruiter123"), User.Role.RECRUITER);
+        User recruiterUser = new User("recruiter@company.com", passwordEncoder.encode("recruiter123"),
+                User.Role.RECRUITER);
         recruiterUser.setEnabled(true);
         userRepository.save(recruiterUser);
 
@@ -101,51 +104,89 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedJobs(Recruiter recruiter, List<Category> categories) {
-        String[][] jobs = {
-            {"Senior Java Developer", "We are looking for an experienced Java developer to join our team.", 
-             "5+ years experience in Java, Spring Boot, PostgreSQL", "New York, NY", "120000", "150000", "FULL_TIME", "SENIOR", "Information Technology"},
-            {"Frontend React Developer", "Join our dynamic frontend team to build amazing user interfaces.",
-             "3+ years React experience, TypeScript, CSS", "Remote", "80000", "120000", "REMOTE", "MID_LEVEL", "Information Technology"},
-            {"Marketing Manager", "Lead our marketing initiatives and grow our brand presence.",
-             "5+ years marketing experience, SEO, PPC", "Los Angeles, CA", "90000", "130000", "FULL_TIME", "SENIOR", "Marketing"},
-            {"Financial Analyst", "Analyze financial data and provide insights for business decisions.",
-             "CFA preferred, 3+ years experience", "Chicago, IL", "70000", "100000", "FULL_TIME", "MID_LEVEL", "Finance"},
-            {"UX Designer", "Create beautiful and intuitive user experiences for our products.",
-             "Portfolio required, Figma, UI/UX", "San Francisco, CA", "90000", "140000", "FULL_TIME", "MID_LEVEL", "Design"},
-            {"Data Scientist", "Build ML models and analyze complex datasets.",
-             "Python, ML, Statistics, SQL", "Austin, TX", "110000", "160000", "FULL_TIME", "SENIOR", "Information Technology"},
-            {"Sales Representative", "Drive sales growth and maintain client relationships.",
-             "B2B sales, communication skills", "Miami, FL", "50000", "80000", "FULL_TIME", "ENTRY_LEVEL", "Sales"},
-            {"HR Coordinator", "Support HR operations and employee engagement initiatives.",
-             "HR degree, 2+ years experience", "Seattle, WA", "55000", "75000", "FULL_TIME", "ENTRY_LEVEL", "Human Resources"},
-            {"DevOps Engineer", "Manage CI/CD pipelines and cloud infrastructure.",
-             "AWS, Docker, Kubernetes", "Remote", "100000", "140000", "REMOTE", "SENIOR", "Information Technology"},
-            {"Product Manager", "Lead product development and strategy.",
-             "5+ years PM experience, Agile", "Boston, MA", "110000", "150000", "FULL_TIME", "SENIOR", "Engineering"}
+        Object[][] jobDataList = {
+                {
+                        "Senior Full Stack Engineer (Java/React)",
+                        "We are looking for a Senior Full Stack Engineer to lead the development of our core platform. You will work with a modern tech stack and solve complex scalability challenges.",
+                        "8+ years of experience in Java and Spring Boot\nStrong proficiency in React, TypeScript, and modern CSS\nExperience with microservices architecture and AWS\nExcellent problem-solving and communication skills",
+                        "Design and implement scalable backend services using Java/Spring\nDevelop responsive and interactive frontend components with React\nMentor junior developers and participate in code reviews\nCollaborate with product managers to define technical requirements",
+                        "140000", "180000", "FULL_TIME", "SENIOR", "Information Technology"
+                },
+                {
+                        "Digital Marketing Specialist",
+                        "Join our growing marketing team to drive user acquisition and brand awareness through data-driven digital campaigns.",
+                        "3+ years experience in digital marketing\nExpertise in Google Ads and Meta Ads Manager\nStrong analytical skills and experience with GA4\nBachelor's degree in Marketing or related field",
+                        "Manage and optimize multi-channel digital advertising campaigns\nAnalyze campaign performance data and provide actionable insights\nConduct A/B testing on ad creatives and landing pages\nCollaborate with the design team to create high-performing ad assets",
+                        "70000", "95000", "FULL_TIME", "MID_LEVEL", "Marketing"
+                },
+                {
+                        "Product Designer (UI/UX)",
+                        "We're seeking a talented Product Designer to create intuitive and beautiful experiences for our global users.",
+                        "Portfolio demonstrating strong UI/UX principles\nProficiency in Figma and Adobe Creative Suite\nExperience with user research and prototyping\nAbility to work in a fast-paced, agile environment",
+                        "Create low and high-fidelity wireframes and prototypes\nConduct user testing sessions to validate design decisions\nMaintain and evolve our design system\nWork closely with engineers to ensure design fidelity during implementation",
+                        "90000", "130000", "REMOTE", "MID_LEVEL", "Design"
+                },
+                {
+                        "DevOps / Infrastructure Engineer",
+                        "Help us build and maintain a robust, automated infrastructure to support our rapidly scaling services.",
+                        "5+ years experience in DevOps or SRE roles\nExpertise in Terraform and Kubernetes\nStrong knowledge of AWS or GCP services\nProficiency in scripting languages (Python, Go, or Bash)",
+                        "Automate infrastructure provisioning using Terraform\nManage and optimize our Kubernetes clusters\nImplement and maintain CI/CD pipelines\nMonitor system performance and lead incident response efforts",
+                        "130000", "170000", "HYBRID", "SENIOR", "Information Technology"
+                },
+                {
+                        "Entry-Level Sales Associate",
+                        "Kickstart your career in sales with a dynamic team. We provide extensive training and a clear path for growth.",
+                        "Recent graduate or 1 year sales experience\nHighly motivated with excellent communication skills\nResilient attitude and desire to learn\nComfortable with cold calling and outreach",
+                        "Identify and qualify new business leads\nConduct product demonstrations for potential clients\nMaintain accurate records in our CRM system\nCollaborate with account managers to close deals",
+                        "45000", "65000", "FULL_TIME", "ENTRY_LEVEL", "Sales"
+                },
+                {
+                        "Senior Financial Analyst",
+                        "Provide strategic financial guidance and analysis to support our international expansion.",
+                        "CPA or CFA qualification required\n6+ years experience in corporate finance\nAdvanced Excel modeling and SQL skills\nExperience with ERP systems (SAP or Oracle)",
+                        "Develop comprehensive financial models and forecasts\nPrepare monthly and quarterly performance reports for executives\nAnalyze market trends and competitor financial data\nLead the annual budgeting process across departments",
+                        "110000", "145000", "FULL_TIME", "SENIOR", "Finance"
+                },
+                {
+                        "Content Content Strategist",
+                        "Shape our brand's voice and lead our content production across all digital platforms.",
+                        "4+ years experience in content strategy or copywriting\nStrong editorial skills and attention to detail\nUnderstanding of SEO best practices and social media trends\nExperience managing a content calendar",
+                        "Develop and execute a cohesive content strategy\nWrite and edit high-quality blog posts, whitepapers, and social content\nManage a team of freelance writers and designers\nTrack and report on content engagement metrics",
+                        "75000", "105000", "REMOTE", "MID_LEVEL", "Marketing"
+                },
+                {
+                        "Customer Success Manager",
+                        "Ensure our enterprise clients achieve their goals and see maximum value from our platform.",
+                        "3+ years in Customer Success or Account Management\nStrong relationship-building and negotiation skills\nExperience with SaaS products and CRM tools\nProactive problem-solving approach",
+                        "Onboard new enterprise clients and drive platform adoption\nConduct regular business reviews to track client success\nIdentify opportunities for upselling and cross-selling\nAct as the voice of the customer for the product team",
+                        "80000", "110000", "FULL_TIME", "MID_LEVEL", "Sales"
+                }
         };
 
-        for (String[] jobData : jobs) {
+        for (Object[] jd : jobDataList) {
             Job job = new Job();
             job.setRecruiter(recruiter);
-            job.setTitle(jobData[0]);
-            job.setDescription(jobData[1]);
-            job.setRequirements(jobData[2]);
-            job.setLocation(jobData[3]);
-            job.setSalaryMin(new BigDecimal(jobData[4]));
-            job.setSalaryMax(new BigDecimal(jobData[5]));
-            job.setJobType(Job.JobType.valueOf(jobData[6]));
-            job.setExperienceLevel(Job.ExperienceLevel.valueOf(jobData[7]));
+            job.setTitle((String) jd[0]);
+            job.setDescription((String) jd[1]);
+            job.setRequirements((String) jd[2]);
+            job.setResponsibilities((String) jd[3]);
+            job.setSalaryMin(new BigDecimal((String) jd[4]));
+            job.setSalaryMax(new BigDecimal((String) jd[5]));
+            job.setJobType(Job.JobType.valueOf((String) jd[6]));
+            job.setExperienceLevel(Job.ExperienceLevel.valueOf((String) jd[7]));
+
+            job.setLocation(job.getJobType() == Job.JobType.REMOTE ? "Remote" : "New York, NY");
             job.setStatus(Job.Status.APPROVED);
-            job.setVacancies((int) (Math.random() * 5) + 1);
-            job.setDeadline(LocalDate.now().plusDays((long) (Math.random() * 30) + 15));
-            
+            job.setVacancies((int) (Math.random() * 3) + 1);
+            job.setDeadline(LocalDate.now().plusWeeks((long) (Math.random() * 4) + 2));
+
             for (Category cat : categories) {
-                if (cat.getName().equals(jobData[8])) {
+                if (cat.getName().equals(jd[8])) {
                     job.setCategory(cat);
                     break;
                 }
             }
-            
+
             jobRepository.save(job);
         }
     }

@@ -1,82 +1,351 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main}">
-<head>
-    <title>Job Details</title>
-</head>
-<body>
-<main layout:fragment="content">
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 th:text="${job.title}">Job Title</h2>
-                        <h5 class="text-muted" th:text="${job.recruiter?.companyName}">Company</h5>
-                        
-                        <div class="my-3">
-                            <span class="badge bg-light text-dark me-2">
-                                <i class="bi bi-geo-alt me-1"></i><span th:text="${job.location}">Location</span>
-                            </span>
-                            <span class="badge bg-primary me-2" th:text="${job.jobType}">Type</span>
-                            <span class="badge bg-success" th:if="${job.salaryMin}" th:text="${'$' + job.salaryMin + ' - $' + job.salaryMax}">Salary</span>
-                        </div>
-                        
-                        <hr>
-                        
-                        <h4>Description</h4>
-                        <p th:text="${job.description}">Description</p>
-                        
-                        <h4 class="mt-4">Requirements</h4>
-                        <p th:text="${job.requirements}">Requirements</p>
-                        
-                        <div class="mt-4">
-                            <span th:if="${job.deadline}">
-                                <strong>Deadline:</strong> <span th:text="${job.deadline}">Deadline</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/main}"
+>
+  <head>
+    <title th:text="${job.title + ' | Job Details'}">Job Details</title>
+  </head>
+  <body>
+    <main layout:fragment="content">
+      <!-- Hero Header Section -->
+      <header class="job-detail-header bg-white border-bottom py-5 mb-5">
+        <div class="container">
+          <div class="row align-items-center g-4">
+            <div class="col-md-auto">
+              <div class="company-logo-wrapper">
+                <img
+                  th:if="${job.recruiter?.companyLogo}"
+                  th:src="${job.recruiter.companyLogo}"
+                  th:alt="${job.recruiter.companyName}"
+                />
+                <i
+                  th:unless="${job.recruiter?.companyLogo}"
+                  class="bi bi-building"
+                ></i>
+              </div>
             </div>
-            
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Apply for this job</h5>
-                        
-                        <div th:if="${param.error}" class="alert alert-danger">
-                            <span th:text="${param.error}">Error message</span>
-                        </div>
-                        
-                        <div th:if="${param.success}" class="alert alert-success">
-                            Application submitted successfully!
-                        </div>
-                        
-                        <div th:if="${alreadyApplied}" class="alert alert-info">
-                            You have already applied for this job.
-                        </div>
-                        
-                        <div th:if="${#authorization.expression('isAuthenticated()')}">
-                            <form th:action="@{/job-seeker/apply/{id}(id=${job.id})}" method="post">
-                                <div class="mb-3">
-                                    <label for="coverLetter" class="form-label">Cover Letter</label>
-                                    <textarea class="form-control" id="coverLetter" name="coverLetter" rows="5" 
-                                              placeholder="Tell us why you're a great fit for this position..."></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Submit Application</button>
-                            </form>
-                        </div>
-                        
-                        <div th:unless="${#authorization.expression('isAuthenticated()')}">
-                            <a th:href="@{/login}" class="btn btn-primary w-100">Login to Apply</a>
-                            <p class="text-muted mt-2 small">Don't have an account? <a th:href="@{/register}">Register here</a></p>
-                        </div>
-                    </div>
+            <div class="col-md">
+              <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb mb-0 small fw-medium">
+                  <li class="breadcrumb-item">
+                    <a th:href="@{/jobs/search}" class="text-muted text-decoration-none">Explore Jobs</a>
+                  </li>
+                  <li
+                    class="breadcrumb-item active text-primary"
+                    aria-current="page"
+                    th:text="${job.category?.name}"
+                  >
+                    Category
+                  </li>
+                </ol>
+              </nav>
+              <h1 class="display-5 fw-bold text-dark mb-3" th:text="${job.title}">
+                Job Title
+              </h1>
+              <div class="d-flex flex-wrap align-items-center gap-4">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-building text-primary me-2 fs-5"></i>
+                  <span
+                    class="fw-bold text-dark fs-5"
+                    th:text="${job.recruiter?.companyName}"
+                    >Company</span
+                  >
+                  <i th:if="${job.recruiter?.verified}" class="bi bi-patch-check-fill text-primary ms-2" title="Verified Company"></i>
                 </div>
+                <div class="text-muted">
+                  <i class="bi bi-geo-alt me-1"></i>
+                  <span th:text="${job.location}">Location</span>
+                </div>
+                <div class="text-muted">
+                  <i class="bi bi-calendar3 me-1"></i>
+                  <span
+                    th:text="${'Posted ' + #temporals.format(job.createdAt, 'dd MMM yyyy')}"
+                    >Date</span
+                  >
+                </div>
+              </div>
             </div>
+            <div class="col-md-auto">
+              <div class="d-flex gap-2">
+                  <!-- Bookmark Button for Job Seekers -->
+                  <button th:if="${isJobSeeker}" 
+                          class="btn btn-outline-warning rounded-pill px-4 py-2 fw-bold" 
+                          th:classappend="${isSaved} ? 'active bg-warning text-white' : ''"
+                          th:onclick="'toggleSave(this, ' + ${job.id} + ')'">
+                      <i class="bi" th:classappend="${isSaved} ? 'bi-bookmark-fill' : 'bi-bookmark'"></i> 
+                      <span th:text="${isSaved ? 'Saved' : 'Save'}">Save</span>
+                  </button>
+                  
+                  <div th:if="${alreadyApplied}" class="badge bg-soft-success text-success d-flex align-items-center px-4 rounded-pill fw-bold">
+                    <i class="bi bi-check-circle-fill me-2"></i> Application Sent
+                  </div>
+                  
+                  <div th:if="${job.status?.name() == 'CLOSED'}" class="badge bg-soft-danger text-danger d-flex align-items-center px-4 rounded-pill fw-bold">
+                    <i class="bi bi-lock-fill me-2"></i> Position Closed
+                  </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</main>
-</body>
+      </header>
+
+      <div class="container pb-5">
+        <div class="row g-5">
+          <!-- Main Content -->
+          <div class="col-lg-8">
+            <!-- Job Overview Card -->
+            <div class="overview-card-premium mb-5">
+              <h5 class="fw-bold mb-4 d-flex align-items-center">
+                  <i class="bi bi-info-circle text-primary me-2"></i> Job Overview
+              </h5>
+              <div class="overview-grid-premium">
+                <!-- Salary -->
+                <div class="overview-item-v2">
+                   <div class="overview-icon"><i class="bi bi-cash-stack"></i></div>
+                   <div class="overview-info">
+                       <div class="label">Offered Salary</div>
+                       <div class="value" th:if="${job.salaryMin}" th:text="${'$' + job.salaryMin + ' - $' + job.salaryMax}">$5,000</div>
+                       <div class="value" th:unless="${job.salaryMin}">Competitive</div>
+                   </div>
+                </div>
+                <!-- Location -->
+                <div class="overview-item-v2">
+                    <div class="overview-icon"><i class="bi bi-geo-alt"></i></div>
+                    <div class="overview-info">
+                        <div class="label">Location</div>
+                        <div class="value" th:text="${job.location}">Remote</div>
+                    </div>
+                 </div>
+                 <!-- Job Type -->
+                 <div class="overview-item-v2">
+                    <div class="overview-icon"><i class="bi bi-briefcase"></i></div>
+                    <div class="overview-info">
+                        <div class="label">Job Type</div>
+                        <div class="value" th:text="${job.jobType}">Full Time</div>
+                    </div>
+                 </div>
+                 <!-- Experience -->
+                 <div class="overview-item-v2">
+                    <div class="overview-icon"><i class="bi bi-mortarboard"></i></div>
+                    <div class="overview-info">
+                        <div class="label">Experience</div>
+                        <div class="value" th:text="${#strings.capitalize(#strings.toLowerCase(job.experienceLevel))}">Expert</div>
+                    </div>
+                 </div>
+              </div>
+            </div>
+
+            <!-- Job Description -->
+            <div class="job-content-section">
+              <h4>Job Description</h4>
+              <div
+                class="text-secondary fs-6 lh-lg mb-5"
+                th:utext="${job.description}"
+              >
+                Full description goes here...
+              </div>
+
+              <div class="row g-4 mb-5">
+                <!-- Job Responsibilities -->
+                <div class="col-md-6" th:if="${job.responsibilities != null and !job.responsibilities.isEmpty()}">
+                    <div class="card border-0 bg-transparent h-100">
+                        <h4 class="h5 fw-bold mb-4 text-dark d-flex align-items-center">
+                            <i class="bi bi-bullseye text-primary me-2"></i> Job Responsibilities
+                        </h4>
+                        <div class="text-secondary rich-content-view" th:utext="${job.responsibilities}">
+                            Responsibility item
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Requirements -->
+                <div class="col-md-6" th:if="${job.requirements != null and !job.requirements.isEmpty()}">
+                    <div class="card border-0 bg-transparent h-100">
+                        <h4 class="h5 fw-bold mb-4 text-dark d-flex align-items-center">
+                            <i class="bi bi-stars text-success me-2"></i> Key Requirements
+                        </h4>
+                        <div class="text-secondary rich-content-view" th:utext="${job.requirements}">
+                            Requirement item
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+              <!-- About Company -->
+              <div class="company-section bg-light p-4 rounded-4 border">
+                <h4 class="mb-4">
+                  About <span th:text="${job.recruiter?.companyName}">Company</span>
+                </h4>
+                <div
+                  class="text-secondary mb-0 lh-lg"
+                  th:utext="${job.recruiter?.companyDescription}"
+                >
+                  Company description...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="col-lg-4">
+            <div class="sticky-top" style="top: 100px;">
+              <!-- Application Box -->
+              <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                <div class="card-body p-4">
+                  <h5 class="fw-bold mb-4">Interested in this role?</h5>
+
+                  <div th:if="${param.error}" class="alert alert-soft-danger small border-0 mb-3">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    <span th:text="${param.error}">Error message</span>
+                  </div>
+
+                  <div th:if="${success}" class="alert alert-soft-success small border-0 mb-3">
+                    <i class="bi bi-check-circle me-2"></i> Application submitted!
+                  </div>
+
+                  <div th:if="${isJobSeeker}">
+                    <div
+                      th:unless="${alreadyApplied or job.status?.name() == 'CLOSED'}"
+                    >
+                      <form
+                        th:action="@{/job-seeker/apply/{id}(id=${job.id})}"
+                        method="post"
+                      >
+                        <div class="mb-4">
+                          <label
+                            for="coverLetter"
+                            class="form-label small fw-bold text-muted text-uppercase"
+                            >Cover Letter (Optional)</label
+                          >
+                          <textarea
+                            class="form-control border-light bg-light"
+                            id="coverLetter"
+                            name="coverLetter"
+                            rows="4"
+                            placeholder="Tell the recruiter why you're the perfect fit..."
+                          ></textarea>
+                        </div>
+                        <button
+                          type="submit"
+                          class="btn btn-primary w-100 btn-apply-lg py-3"
+                        >
+                          Submit Application <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                      </form>
+                    </div>
+                    
+                    <div th:if="${alreadyApplied}" class="text-center">
+                        <div class="bg-soft-success text-success p-3 rounded-3 mb-3">
+                            <i class="bi bi-check-circle-fill fs-3 d-block mb-1"></i>
+                            <span class="fw-bold">Applied Successfully</span>
+                        </div>
+                        <a th:href="@{/messages/chat/{id}(id=${job.recruiter.user.id})}" 
+                           class="btn btn-soft-info w-100 py-3 fw-bold rounded-3 border-0">
+                          <i class="bi bi-chat-dots-fill me-2"></i> Send a Message
+                        </a>
+                    </div>
+
+                    <div
+                      th:if="${job.status?.name() == 'CLOSED'}"
+                      class="text-center bg-soft-danger text-danger p-4 rounded-3"
+                    >
+                      <i class="bi bi-lock-fill fs-3 d-block mb-2"></i>
+                      <span class="fw-bold">This position is now closed</span>
+                    </div>
+                  </div>
+
+                  <!-- Guest View -->
+                  <div th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <p class="text-muted small mb-4">Join our community to apply for this position and track your application status.</p>
+                    <a th:href="@{/login}" class="btn btn-primary w-100 btn-apply-lg py-3 mb-3">Login to Apply</a>
+                    <div class="text-center small">
+                      <span class="text-muted">Don't have an account?</span>
+                      <a th:href="@{/register}" class="fw-bold text-primary text-decoration-none ms-1">Register now</a>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Company Summary Card -->
+              <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-body p-4">
+                  <h6 class="fw-bold mb-4">Company Overview</h6>
+                  <div class="d-flex align-items-center mb-4">
+                    <div class="company-logo-wrapper me-3" style="width: 60px; height: 60px; font-size: 1.5rem">
+                      <img th:if="${job.recruiter?.companyLogo}" th:src="${job.recruiter.companyLogo}"/>
+                      <i th:unless="${job.recruiter?.companyLogo}" class="bi bi-building"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold text-dark" th:text="${job.recruiter?.companyName}">Company Name</div>
+                      <div class="small text-muted d-flex align-items-center">
+                        <i class="bi bi-patch-check-fill text-primary me-1" th:if="${job.recruiter?.verified}"></i>
+                        <span th:text="${job.recruiter?.verified ? 'Verified Employer' : 'Standard Employer'}">Verified</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="small mb-3 d-flex align-items-center text-muted">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    <span th:text="${job.recruiter?.companyLocation ?: job.location}">Location</span>
+                  </div>
+                  
+                  <div class="small mb-4 d-flex align-items-center text-muted" th:if="${job.recruiter?.companyWebsite}">
+                    <i class="bi bi-globe me-2"></i>
+                    <a th:href="${job.recruiter.companyWebsite}" target="_blank" class="text-primary text-decoration-none fw-medium" th:text="${job.recruiter.companyWebsite}">website.com</a>
+                  </div>
+
+                  <div class="d-grid gap-2">
+                    <a th:href="@{/jobs/search(recruiterId=${job.recruiter?.id})}" class="btn btn-light btn-sm text-dark fw-bold py-2 rounded-3">
+                      All jobs from this company
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Social Share -->
+              <div class="card border-0 bg-transparent mb-4">
+                  <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                      <span class="small fw-bold text-muted text-uppercase">Share this job</span>
+                      <div class="d-flex gap-2">
+                          <button class="btn btn-white border btn-sm rounded-circle shadow-sm" style="width: 36px; height: 36px;"><i class="bi bi-linkedin"></i></button>
+                          <button class="btn btn-white border btn-sm rounded-circle shadow-sm" style="width: 36px; height: 36px;"><i class="bi bi-twitter-x"></i></button>
+                          <button class="btn btn-white border btn-sm rounded-circle shadow-sm" style="width: 36px; height: 36px;"><i class="bi bi-link-45deg fs-5"></i></button>
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script layout:fragment="script">
+        function toggleSave(btn, jobId) {
+            fetch('/job-seeker/saved-jobs/toggle/' + jobId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                }
+            }).then(response => response.text())
+            .then(data => {
+                const icon = btn.querySelector('i');
+                const span = btn.querySelector('span');
+                if (data === 'saved') {
+                    btn.classList.add('active', 'bg-warning', 'text-white');
+                    icon.classList.remove('bi-bookmark');
+                    icon.classList.add('bi-bookmark-fill');
+                    if (span) span.textContent = 'Saved';
+                } else if (data === 'removed') {
+                    btn.classList.remove('active', 'bg-warning', 'text-white');
+                    icon.classList.add('bi-bookmark');
+                    icon.classList.remove('bi-bookmark-fill');
+                    if (span) span.textContent = 'Save';
+                }
+            });
+        }
+    </script>
+  </body>
 </html>

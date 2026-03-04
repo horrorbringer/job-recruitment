@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/dashboard}">
+<head>
+    <title>Notifications | JobPortal</title>
+</head>
+<body>
+<main layout:fragment="content" class="bg-light">
+    <!-- Header -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">Notification Center</h2>
+            <p class="text-muted mb-0">Stay updated with your latest activities and updates.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a th:href="@{/notifications/mark-all-read}" class="btn btn-outline-primary rounded-pill px-4">
+                <i class="bi bi-check-all me-1"></i>Mark All as Read
+            </a>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="card-body p-0">
+            <div th:if="${#lists.isEmpty(notifications.content)}" class="text-center py-5">
+                <div class="bg-light rounded-circle p-4 d-inline-block mb-3">
+                    <i class="bi bi-bell-slash text-muted fs-1"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No notifications yet</h5>
+                <p class="text-muted">We'll alert you when there's an update on your applications or jobs.</p>
+            </div>
+
+            <div class="list-group list-group-flush" th:unless="${#lists.isEmpty(notifications.content)}">
+                <a th:each="notif : ${notifications.content}" 
+                   th:href="@{${notif.link}}"
+                   class="list-group-item list-group-item-action p-4 border-start border-4 transition-all"
+                   th:classappend="${!notif.isRead} ? 'border-primary bg-soft-primary' : 'border-transparent'">
+                    
+                    <div class="d-flex align-items-start">
+                        <div class="icon-box rounded-circle p-3 me-3"
+                             th:classappend="${notif.type == 'interview'} ? 'bg-soft-info text-info' : 
+                                            (${notif.type == 'rejected'} ? 'bg-soft-danger text-danger' : 
+                                            (${notif.type == 'hired'} ? 'bg-soft-success text-success' : 'bg-soft-primary text-primary'))">
+                            <i class="bi" th:classappend="${notif.type == 'interview'} ? 'bi-calendar-event' : 
+                                                         (${notif.type == 'rejected'} ? 'bi-x-circle' : 
+                                                         (${notif.type == 'hired'} ? 'bi-check-circle' : 'bi-bell'))"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="fw-bold mb-0 text-dark" th:text="${notif.title}">Notification Title</h6>
+                                <small class="text-muted ms-2" th:text="${#temporals.format(notif.createdAt, 'dd MMM, HH:mm')}">Time</small>
+                            </div>
+                            <p class="text-secondary mb-0 small" th:text="${notif.message}">Notification message content details.</p>
+                        </div>
+                        <div th:if="${!notif.isRead}" class="ms-3">
+                            <span class="badge bg-primary rounded-pill smaller">New</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="p-4 border-top" th:if="${notifications.totalPages > 1}">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item" th:classappend="${notifications.first} ? 'disabled'">
+                            <a class="page-link rounded-pill px-3 me-2" th:href="@{/notifications(page=${notifications.number - 1})}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, notifications.totalPages - 1)}"
+                            th:classappend="${i == notifications.number} ? 'active'">
+                            <a class="page-link rounded-pill mx-1" th:href="@{/notifications(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${notifications.last} ? 'disabled'">
+                            <a class="page-link rounded-pill px-3 ms-2" th:href="@{/notifications(page=${notifications.number + 1})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

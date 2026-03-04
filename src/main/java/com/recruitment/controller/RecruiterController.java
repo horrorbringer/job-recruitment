@@ -35,36 +35,45 @@ public class RecruiterController {
         Recruiter profile = recruiterService.getProfile(user.getId());
         long jobCount = jobService.countByRecruiterId(user.getId());
         long applicationCount = profile != null ? applicationService.countByRecruiterId(profile.getId()) : 0;
-        
+        long interviewCount = profile != null
+                ? applicationService.countByRecruiterIdAndStatus(profile.getId(),
+                        Application.Status.INTERVIEW_SCHEDULED)
+                : 0;
+        long openPositions = profile != null
+                ? jobService.countByRecruiterIdAndStatus(profile.getId(), Job.Status.APPROVED)
+                : 0;
+
         model.addAttribute("profile", profile);
         model.addAttribute("jobCount", jobCount);
         model.addAttribute("applicationCount", applicationCount);
-        
+        model.addAttribute("interviewCount", interviewCount);
+        model.addAttribute("openPositions", openPositions);
+
         if (profile != null) {
             Page<Application> recentApps = applicationService.getByRecruiterId(
-                profile.getId(), PageRequest.of(0, 5, Sort.by("createdAt").descending()));
+                    profile.getId(), PageRequest.of(0, 5, Sort.by("createdAt").descending()));
             model.addAttribute("recentApplications", recentApps);
         }
-        
+
         return "recruiter/dashboard";
     }
 
     @GetMapping("/applications")
     public String allApplications(@RequestParam(defaultValue = "0") int page,
-                                  @RequestParam(defaultValue = "10") int size,
-                                  Model model,
-                                  @AuthenticationPrincipal UserDetails userDetails) {
+            @RequestParam(defaultValue = "10") int size,
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByEmail(userDetails.getUsername());
         Recruiter profile = recruiterService.getProfile(user.getId());
         if (profile == null) {
             return "redirect:/recruiter/profile";
         }
-        
+
         Page<Application> applications = applicationService.getByRecruiterId(
-            profile.getId(), PageRequest.of(page, size, Sort.by("createdAt").descending()));
-        
+                profile.getId(), PageRequest.of(page, size, Sort.by("createdAt").descending()));
+
         model.addAttribute("applications", applications);
-        
+
         return "recruiter/applications";
     }
 
@@ -72,7 +81,7 @@ public class RecruiterController {
     public String profileForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByEmail(userDetails.getUsername());
         Recruiter profile = recruiterService.getProfile(user.getId());
-        
+
         if (profile == null) {
             model.addAttribute("profileDTO", new RecruiterProfileDTO());
         } else {
@@ -84,16 +93,16 @@ public class RecruiterController {
             model.addAttribute("profileDTO", dto);
             model.addAttribute("profile", profile);
         }
-        
+
         return "recruiter/profile";
     }
 
     @PostMapping("/profile")
     public String updateProfile(@AuthenticationPrincipal UserDetails userDetails,
-                               @Valid @ModelAttribute("profileDTO") RecruiterProfileDTO dto,
-                               BindingResult result,
-                               RedirectAttributes redirectAttributes) {
-        
+            @Valid @ModelAttribute("profileDTO") RecruiterProfileDTO dto,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+
         if (result.hasErrors()) {
             return "recruiter/profile";
         }
@@ -117,9 +126,9 @@ public class RecruiterController {
 
     @PostMapping("/profile/logo")
     public String uploadLogo(@AuthenticationPrincipal UserDetails userDetails,
-                            @RequestParam("logo") MultipartFile file,
-                            RedirectAttributes redirectAttributes) {
-        
+            @RequestParam("logo") MultipartFile file,
+            RedirectAttributes redirectAttributes) {
+
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             recruiterService.uploadLogo(user.getId(), file);
@@ -133,15 +142,15 @@ public class RecruiterController {
 
     @GetMapping("/jobs")
     public String jobs(@AuthenticationPrincipal UserDetails userDetails,
-                      @RequestParam(defaultValue = "0") int page,
-                      Model model) {
-        
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
+
         User user = userService.findByEmail(userDetails.getUsername());
         Recruiter profile = recruiterService.getProfile(user.getId());
-        
+
         if (profile != null) {
-            Page<Job> jobs = jobService.getRecruiterJobs(profile.getId(), 
-                PageRequest.of(page, 10, Sort.by("createdAt").descending()));
+            Page<Job> jobs = jobService.getRecruiterJobs(profile.getId(),
+                    PageRequest.of(page, 10, Sort.by("createdAt").descending()));
             model.addAttribute("jobs", jobs);
         }
         return "recruiter/jobs";
@@ -156,11 +165,11 @@ public class RecruiterController {
 
     @PostMapping("/jobs/create")
     public String createJob(@AuthenticationPrincipal UserDetails userDetails,
-                           @Valid @ModelAttribute("jobDTO") JobCreateDTO dto,
-                           BindingResult result,
-                           RedirectAttributes redirectAttributes,
-                           Model model) {
-        
+            @Valid @ModelAttribute("jobDTO") JobCreateDTO dto,
+            BindingResult result,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryRepository.findByActiveTrueOrderByNameAsc());
             return "recruiter/job-form";
@@ -182,9 +191,9 @@ public class RecruiterController {
 
     @GetMapping("/jobs/{id}/edit")
     public String editJobForm(@PathVariable Long id,
-                             @AuthenticationPrincipal UserDetails userDetails,
-                             Model model) {
-        
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
+
         Job job = jobService.getJob(id);
         if (job == null) {
             return "redirect:/recruiter/jobs";
@@ -200,6 +209,7 @@ public class RecruiterController {
         dto.setTitle(job.getTitle());
         dto.setDescription(job.getDescription());
         dto.setRequirements(job.getRequirements());
+        dto.setResponsibilities(job.getResponsibilities());
         dto.setLocation(job.getLocation());
         dto.setSalaryMin(job.getSalaryMin());
         dto.setSalaryMax(job.getSalaryMax());
@@ -212,17 +222,17 @@ public class RecruiterController {
         model.addAttribute("jobDTO", dto);
         model.addAttribute("jobId", id);
         model.addAttribute("categories", categoryRepository.findByActiveTrueOrderByNameAsc());
-        
+
         return "recruiter/job-form";
     }
 
     @PostMapping("/jobs/{id}/edit")
     public String updateJob(@PathVariable Long id,
-                           @Valid @ModelAttribute("jobDTO") JobCreateDTO dto,
-                           BindingResult result,
-                           RedirectAttributes redirectAttributes,
-                           Model model) {
-        
+            @Valid @ModelAttribute("jobDTO") JobCreateDTO dto,
+            BindingResult result,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
         if (result.hasErrors()) {
             model.addAttribute("jobId", id);
             model.addAttribute("categories", categoryRepository.findByActiveTrueOrderByNameAsc());
@@ -241,7 +251,7 @@ public class RecruiterController {
 
     @PostMapping("/jobs/{id}/delete")
     public String deleteJob(@PathVariable Long id,
-                           RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
         try {
             jobService.deleteJob(id);
             redirectAttributes.addFlashAttribute("success", "Job deleted successfully!");
@@ -254,26 +264,26 @@ public class RecruiterController {
 
     @GetMapping("/jobs/{id}/applications")
     public String applications(@PathVariable Long id,
-                              @RequestParam(defaultValue = "0") int page,
-                              Model model) {
-        
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
+
         Job job = jobService.getJob(id);
-        Page<Application> applications = applicationService.getJobApplications(id, 
-            PageRequest.of(page, 10, Sort.by("createdAt").descending()));
-        
+        Page<Application> applications = applicationService.getJobApplications(id,
+                PageRequest.of(page, 10, Sort.by("createdAt").descending()));
+
         model.addAttribute("job", job);
         model.addAttribute("applications", applications);
-        
+
         return "recruiter/applications";
     }
 
     @PostMapping("/applications/{id}/status")
     public String updateApplicationStatus(@PathVariable Long id,
-                                         @RequestParam Application.Status status,
-                                         @RequestParam(required = false) String note,
-                                         @RequestParam(required = false) Long jobId,
-                                         RedirectAttributes redirectAttributes) {
-        
+            @RequestParam Application.Status status,
+            @RequestParam(required = false) String note,
+            @RequestParam(required = false) Long jobId,
+            RedirectAttributes redirectAttributes) {
+
         try {
             applicationService.updateStatus(id, status, note);
             redirectAttributes.addFlashAttribute("success", "Application status updated!");
@@ -289,12 +299,12 @@ public class RecruiterController {
 
     @PostMapping("/applications/{id}/schedule-interview")
     public String scheduleInterview(@PathVariable Long id,
-                                    @RequestParam String interviewDate,
-                                    @RequestParam String interviewTime,
-                                    @RequestParam String interviewLocation,
-                                    @RequestParam(required = false) String interviewNotes,
-                                    RedirectAttributes redirectAttributes) {
-        
+            @RequestParam String interviewDate,
+            @RequestParam String interviewTime,
+            @RequestParam String interviewLocation,
+            @RequestParam(required = false) String interviewNotes,
+            RedirectAttributes redirectAttributes) {
+
         try {
             LocalDateTime dateTime = LocalDateTime.parse(interviewDate + "T" + interviewTime);
             applicationService.scheduleInterview(id, dateTime, interviewLocation, interviewNotes);

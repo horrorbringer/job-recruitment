@@ -31,6 +31,9 @@ public class Job extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String requirements;
 
+    @Column(columnDefinition = "TEXT")
+    private String responsibilities;
+
     private String location;
 
     private BigDecimal salaryMin;

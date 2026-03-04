@@ -12,24 +12,30 @@ import java.util.Optional;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
-    
+
     List<Application> findByJobSeekerIdOrderByCreatedAtDesc(Long jobSeekerId);
-    
+
     Page<Application> findByJobIdOrderByCreatedAtDesc(Long jobId, Pageable pageable);
-    
+
     Optional<Application> findByJobIdAndJobSeekerId(Long jobId, Long jobSeekerId);
-    
+
     boolean existsByJobIdAndJobSeekerId(Long jobId, Long jobSeekerId);
-    
+
     @Query("SELECT a.status, COUNT(a) FROM Application a WHERE a.job.recruiter.id = :recruiterId GROUP BY a.status")
     List<Object[]> countByStatusForRecruiter(@Param("recruiterId") Long recruiterId);
-    
+
     @Query("SELECT COUNT(a) FROM Application a WHERE a.job.recruiter.id = :recruiterId")
     long countByRecruiterId(@Param("recruiterId") Long recruiterId);
-    
+
     @Query("SELECT COUNT(a) FROM Application a WHERE a.jobSeeker.id = :jobSeekerId")
     long countByJobSeekerId(@Param("jobSeekerId") Long jobSeekerId);
 
     @Query("SELECT a FROM Application a WHERE a.job.recruiter.id = :recruiterId ORDER BY a.createdAt DESC")
     Page<Application> findByJobRecruiterId(@Param("recruiterId") Long recruiterId, Pageable pageable);
+
+    @Query("SELECT COUNT(a) FROM Application a WHERE a.jobSeeker.id = :jobSeekerId AND a.status = :status")
+    long countByJobSeekerIdAndStatus(@Param("jobSeekerId") Long jobSeekerId,
+            @Param("status") Application.Status status);
+
+    long countByCreatedAtAfter(java.time.LocalDateTime date);
 }
