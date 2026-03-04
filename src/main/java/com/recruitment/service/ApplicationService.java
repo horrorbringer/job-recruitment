@@ -24,7 +24,7 @@ public class ApplicationService {
     @Transactional
     public Application apply(Long jobSeekerId, Long jobId, ApplicationCreateDTO dto) {
         Job job = jobRepository.findById(jobId)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new RuntimeException("Job not found"));
 
         if (job.getStatus() != Job.Status.APPROVED) {
             throw new RuntimeException("This job is not available for applications");
@@ -39,7 +39,7 @@ public class ApplicationService {
         }
 
         JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
-            .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
 
         Application application = new Application();
         application.setJob(job);
@@ -63,7 +63,7 @@ public class ApplicationService {
     @Transactional
     public void updateStatus(Long applicationId, Application.Status status, String note) {
         Application application = applicationRepository.findById(applicationId)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
+                .orElseThrow(() -> new RuntimeException("Application not found"));
 
         application.setStatus(status);
         application.setStatusNote(note);
@@ -73,24 +73,23 @@ public class ApplicationService {
 
         User jobSeekerUser = application.getJobSeeker().getUser();
         String jobTitle = application.getJob().getTitle();
-        
+
         String type = status.name().toLowerCase();
         String link = "/job-seeker/applications";
-        
+
         notificationService.createNotification(
-            jobSeekerUser,
-            "Application Status Updated",
-            "Your application for " + jobTitle + " has been " + status.name().replace("_", " ").toLowerCase(),
-            type,
-            link
-        );
+                jobSeekerUser,
+                "Application Status Updated",
+                "Your application for " + jobTitle + " has been " + status.name().replace("_", " ").toLowerCase(),
+                type,
+                link);
     }
 
     @Transactional
-    public void scheduleInterview(Long applicationId, LocalDateTime interviewDateTime, 
-                                  String interviewLocation, String interviewNotes) {
+    public void scheduleInterview(Long applicationId, LocalDateTime interviewDateTime,
+            String interviewLocation, String interviewNotes) {
         Application application = applicationRepository.findById(applicationId)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
+                .orElseThrow(() -> new RuntimeException("Application not found"));
 
         application.setStatus(Application.Status.INTERVIEW_SCHEDULED);
         application.setInterviewDateTime(interviewDateTime);
@@ -102,20 +101,19 @@ public class ApplicationService {
 
         User jobSeekerUser = application.getJobSeeker().getUser();
         String jobTitle = application.getJob().getTitle();
-        
+
         notificationService.createNotification(
-            jobSeekerUser,
-            "Interview Scheduled!",
-            "Your interview for " + jobTitle + " has been scheduled",
-            "interview",
-            "/job-seeker/applications"
-        );
+                jobSeekerUser,
+                "Interview Scheduled!",
+                "Your interview for " + jobTitle + " has been scheduled",
+                "interview",
+                "/job-seeker/applications");
     }
 
     @Transactional
     public void withdraw(Long applicationId, Long jobSeekerId) {
         Application application = applicationRepository.findById(applicationId)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
+                .orElseThrow(() -> new RuntimeException("Application not found"));
 
         if (!application.getJobSeeker().getId().equals(jobSeekerId)) {
             throw new RuntimeException("Unauthorized");
@@ -129,7 +127,7 @@ public class ApplicationService {
     @Transactional
     public void requestReschedule(Long applicationId, Long jobSeekerId, String reason) {
         Application application = applicationRepository.findById(applicationId)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
+                .orElseThrow(() -> new RuntimeException("Application not found"));
 
         if (!application.getJobSeeker().getId().equals(jobSeekerId)) {
             throw new RuntimeException("Unauthorized");
@@ -140,12 +138,11 @@ public class ApplicationService {
 
         User recruiterUser = application.getJob().getRecruiter().getUser();
         notificationService.createNotification(
-            recruiterUser,
-            "Interview Reschedule Request",
-            "Candidate requested reschedule for " + application.getJob().getTitle(),
-            "reschedule",
-            "/recruiter/applications"
-        );
+                recruiterUser,
+                "Interview Reschedule Request",
+                "Candidate requested reschedule for " + application.getJob().getTitle(),
+                "reschedule",
+                "/recruiter/applications");
     }
 
     public Application getApplication(Long id) {
@@ -170,10 +167,18 @@ public class ApplicationService {
 
     public List<Application> getRecentApplications(Long jobSeekerId, int limit) {
         return applicationRepository.findByJobSeekerIdOrderByCreatedAtDesc(jobSeekerId)
-            .stream().limit(limit).toList();
+                .stream().limit(limit).toList();
     }
 
     public long countByJobSeekerIdAndStatus(Long jobSeekerId, Application.Status status) {
         return applicationRepository.countByJobSeekerIdAndStatus(jobSeekerId, status);
+    }
+
+    public long countByRecruiterIdAndStatus(Long recruiterId, Application.Status status) {
+        return applicationRepository.countByStatusForRecruiter(recruiterId).stream()
+                .filter(row -> row[0] == status)
+                .map(row -> (Long) row[1])
+                .findFirst()
+                .orElse(0L);
     }
 }

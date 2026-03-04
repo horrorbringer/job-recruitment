@@ -15,18 +15,30 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AdminController {
 
     private final AdminService adminService;
+    private final AnalyticsService analyticsService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("stats", adminService.getDashboardStats());
+        model.addAttribute("growth", analyticsService.getMonthlyGrowth());
+        model.addAttribute("registrationData", analyticsService.getDailyUserRegistrations(7));
         return "admin/dashboard";
     }
 
     @GetMapping("/users")
     public String users(@RequestParam(defaultValue = "0") int page,
-                       Model model) {
-        Page<User> users = adminService.getAllUsers(PageRequest.of(page, 20, Sort.by("createdAt").descending()));
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) Boolean locked,
+            Model model) {
+        PageRequest pageRequest = PageRequest.of(page, 20, Sort.by("createdAt").descending());
+        Page<User> users = adminService.getFilteredUsers(role, enabled, locked, pageRequest);
+
         model.addAttribute("users", users);
+        model.addAttribute("currentRole", role);
+        model.addAttribute("currentEnabled", enabled);
+        model.addAttribute("currentLocked", locked);
+
         return "admin/users";
     }
 
@@ -54,11 +66,11 @@ public class AdminController {
 
     @GetMapping("/jobs")
     public String jobs(@RequestParam(defaultValue = "0") int page,
-                      @RequestParam(required = false) String status,
-                      Model model) {
+            @RequestParam(required = false) String status,
+            Model model) {
         Page<Job> jobs;
         PageRequest pageRequest = PageRequest.of(page, 20, Sort.by("createdAt").descending());
-        
+
         if (status == null || status.equals("PENDING")) {
             jobs = adminService.getPendingJobs(pageRequest);
         } else if (status.equals("APPROVED")) {
@@ -68,7 +80,7 @@ public class AdminController {
         } else {
             jobs = adminService.getPendingJobs(pageRequest);
         }
-        
+
         model.addAttribute("jobs", jobs);
         model.addAttribute("currentStatus", status);
         model.addAttribute("stats", adminService.getJobStats());
@@ -116,8 +128,8 @@ public class AdminController {
 
     @PostMapping("/categories")
     public String createCategory(@RequestParam String name,
-                                @RequestParam(required = false) String description,
-                                RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) String description,
+            RedirectAttributes redirectAttributes) {
         try {
             adminService.createCategory(name, description);
             redirectAttributes.addFlashAttribute("success", "Category created!");
@@ -129,10 +141,10 @@ public class AdminController {
 
     @PostMapping("/categories/{id}")
     public String updateCategory(@PathVariable Long id,
-                                @RequestParam String name,
-                                @RequestParam(required = false) String description,
-                                @RequestParam(defaultValue = "true") boolean active,
-                                RedirectAttributes redirectAttributes) {
+            @RequestParam String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(defaultValue = "true") boolean active,
+            RedirectAttributes redirectAttributes) {
         try {
             adminService.updateCategory(id, name, description, active);
             redirectAttributes.addFlashAttribute("success", "Category updated!");

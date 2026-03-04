@@ -7,30 +7,95 @@
 </head>
 <body>
 <main layout:fragment="content">
+    <!-- Header Section -->
+    <section class="header-gradient py-5 border-bottom">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold mb-3 tracking-wider text-uppercase small">Discovery</span>
+                    <h1 class="display-5 fw-bold text-dark mb-3">Explore All <span class="text-primary-gradient">Opportunities</span></h1>
+                    <p class="lead text-muted mb-0">Browse through our curated list of verified job openings across all industries and find your next career move.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <div class="d-flex flex-column align-items-lg-end">
+                        <div class="h3 fw-bold text-primary mb-1" th:text="${jobs.totalElements}">1,240</div>
+                        <div class="text-muted small text-uppercase fw-bold tracking-wider">Active Openings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <div class="container py-5">
-        <h2 class="mb-4">All Jobs</h2>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
-                <div class="card h-100 job-card hover-shadow">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none">Job Title</a>
-                        </h5>
-                        <p class="text-muted" th:text="${job.recruiter?.companyName}">Company</p>
-                        <div class="mb-2">
-                            <span class="badge bg-light text-dark me-1">
-                                <i class="bi bi-geo-alt me-1"></i><span th:text="${job.location}">Location</span>
+        <!-- Job List Grid -->
+        <div class="row g-4 home-job-grid">
+            <div class="col-lg-4 col-md-6" th:each="job : ${jobs}">
+                <div class="card border-0 shadow-sm rounded-4 premium-job-card h-100 transition-all">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="job-card-logo-box">
+                                <img th:if="${job.recruiter?.companyLogo}" th:src="@{'/uploads/logos/' + ${job.recruiter.companyLogo}}" 
+                                     th:alt="${job.recruiter.companyName}" class="img-fluid" style="max-height: 40px;" />
+                                <i th:unless="${job.recruiter?.companyLogo}" class="bi bi-buildings-fill fs-2 text-primary"></i>
+                            </div>
+                            <span class="job-badge-soft bg-soft-success align-self-start">
+                                [[${#strings.capitalize(#strings.toLowerCase(#strings.replace(job.jobType, '_', ' ')))}]]
                             </span>
-                            <span class="badge bg-primary" th:text="${job.jobType}">Type</span>
                         </div>
-                        <p class="card-text text-truncate" th:text="${job.description}">Description...</p>
+                        
+                        <h5 class="fw-bold mb-1">
+                            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-dark text-decoration-none">Job Title</a>
+                        </h5>
+                        <div class="text-primary fw-medium small mb-3">
+                            [[${job.recruiter?.companyName}]]
+                            <i th:if="${job.recruiter?.verified}" class="bi bi-patch-check-fill ms-1 small"></i>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap gap-x-3 gap-y-2 mb-4 text-muted small">
+                            <span class="d-flex align-items-center"><i class="bi bi-geo-alt me-1"></i> [[${job.location}]]</span>
+                            <span class="d-flex align-items-center"><i class="bi bi-calendar3 me-1"></i> [[${#temporals.format(job.createdAt, 'dd MMM yyyy')}]]</span>
+                        </div>
+                        
+                        <div class="mt-auto border-top pt-3 d-flex justify-content-between align-items-center">
+                            <div class="fw-bold text-dark">
+                                <span th:text="${job.salaryMin != null ? #numbers.formatCurrency(job.salaryMin) : ''}">$80k</span>
+                                <span th:if="${job.salaryMin != null}" class="text-muted small fw-normal mx-1">-</span>
+                                <span th:text="${job.salaryMax != null ? #numbers.formatCurrency(job.salaryMax) : 'Competitive'}">$120k</span>
+                            </div>
+                            <a th:href="@{/jobs/{id}(id=${job.id})}" class="btn btn-sm px-3 rounded-pill btn-apply-soft">View Details</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div th:if="${jobs.empty}" class="text-center py-5">
-            <p class="text-muted">No jobs found</p>
+        <!-- Empty State -->
+        <div th:if="${jobs.empty}" class="bg-white border-0 shadow-sm rounded-4 py-5 px-4 text-center">
+            <div class="bg-soft-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                <i class="bi bi-briefcase text-primary fs-1"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No jobs available</h4>
+            <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">We're currently updating our listings. Please check back later or explore our categories.</p>
+            <a th:href="@{/}" class="btn btn-primary px-5 py-2 rounded-pill shadow-sm">Go to Home</a>
+        </div>
+
+        <!-- Pagination (Basic Placeholder for now) -->
+        <div th:if="${jobs.totalPages > 1}" class="d-flex justify-content-center mt-5">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-pill mb-0">
+                    <li class="page-item" th:classappend="${jobs.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{/jobs(page=${jobs.number - 1})}" aria-label="Previous">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#" th:text="${jobs.number + 1}">1</a></li>
+                    <li class="page-item" th:classappend="${jobs.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/jobs(page=${jobs.number + 1})}" aria-label="Next">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </main>

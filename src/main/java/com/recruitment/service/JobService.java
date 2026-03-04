@@ -26,13 +26,14 @@ public class JobService {
     @Transactional
     public Job createJob(Long recruiterId, JobCreateDTO dto) {
         Recruiter recruiter = recruiterRepository.findById(recruiterId)
-            .orElseThrow(() -> new RuntimeException("Recruiter not found"));
+                .orElseThrow(() -> new RuntimeException("Recruiter not found"));
 
         Job job = new Job();
         job.setRecruiter(recruiter);
         job.setTitle(dto.getTitle());
         job.setDescription(dto.getDescription());
         job.setRequirements(dto.getRequirements());
+        job.setResponsibilities(dto.getResponsibilities());
         job.setLocation(dto.getLocation());
         job.setSalaryMin(dto.getSalaryMin());
         job.setSalaryMax(dto.getSalaryMax());
@@ -44,7 +45,7 @@ public class JobService {
 
         if (dto.getCategoryId() != null) {
             categoryRepository.findById(dto.getCategoryId())
-                .ifPresent(job::setCategory);
+                    .ifPresent(job::setCategory);
         }
 
         return jobRepository.save(job);
@@ -53,11 +54,12 @@ public class JobService {
     @Transactional
     public Job updateJob(Long jobId, JobCreateDTO dto) {
         Job job = jobRepository.findById(jobId)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new RuntimeException("Job not found"));
 
         job.setTitle(dto.getTitle());
         job.setDescription(dto.getDescription());
         job.setRequirements(dto.getRequirements());
+        job.setResponsibilities(dto.getResponsibilities());
         job.setLocation(dto.getLocation());
         job.setSalaryMin(dto.getSalaryMin());
         job.setSalaryMax(dto.getSalaryMax());
@@ -68,7 +70,7 @@ public class JobService {
 
         if (dto.getCategoryId() != null) {
             categoryRepository.findById(dto.getCategoryId())
-                .ifPresent(job::setCategory);
+                    .ifPresent(job::setCategory);
         }
 
         return jobRepository.save(job);
@@ -76,15 +78,15 @@ public class JobService {
 
     public Page<Job> searchJobs(JobSearchDTO search, Pageable pageable) {
         return jobRepository.searchJobs(
-            search.getKeyword(),
-            search.getLocation(),
-            search.getCategoryId(),
-            search.getJobType(),
-            search.getSalaryMin(),
-            search.getSalaryMax(),
-            LocalDate.now(),
-            pageable
-        );
+                search.getKeyword(),
+                search.getLocation(),
+                search.getCategoryId(),
+                search.getJobType(),
+                search.getExperienceLevel(),
+                search.getSalaryMin(),
+                search.getSalaryMax(),
+                LocalDate.now(),
+                pageable);
     }
 
     public Page<Job> getApprovedJobs(Pageable pageable) {
@@ -102,7 +104,7 @@ public class JobService {
     @Transactional
     public void updateStatus(Long jobId, Job.Status status) {
         Job job = jobRepository.findById(jobId)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new RuntimeException("Job not found"));
         job.setStatus(status);
         jobRepository.save(job);
     }
@@ -120,11 +122,15 @@ public class JobService {
         return jobRepository.countByRecruiterId(recruiterId);
     }
 
+    public long countByRecruiterIdAndStatus(Long recruiterId, Job.Status status) {
+        return jobRepository.countByRecruiterIdAndStatus(recruiterId, status);
+    }
+
     public Page<Job> getRecommendedJobs(String skills, Pageable pageable) {
         if (skills == null || skills.trim().isEmpty()) {
             return new PageImpl<>(java.util.Collections.emptyList(), pageable, 0);
         }
-        
+
         // Convert comma-separated skills to regex: "java, spring" -> "(java|spring)"
         String[] skillArray = skills.split(",");
         StringBuilder regexBuilder = new StringBuilder("(");
@@ -135,7 +141,7 @@ public class JobService {
             }
         }
         regexBuilder.append(")");
-        
+
         return jobRepository.findBySkillsRegex(regexBuilder.toString(), pageable);
     }
 }

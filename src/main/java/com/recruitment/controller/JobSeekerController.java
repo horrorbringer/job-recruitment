@@ -24,28 +24,38 @@ public class JobSeekerController {
     private final ApplicationService applicationService;
     private final UserService userService;
     private final JobService jobService;
+    private final SavedJobService savedJobService;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByEmail(userDetails.getUsername());
         JobSeeker profile = jobSeekerService.getProfile(user.getId());
-        
+
         model.addAttribute("profile", profile);
         if (profile != null) {
             model.addAttribute("applicationCount", applicationService.countByJobSeekerId(profile.getId()));
             model.addAttribute("recentApplications", applicationService.getRecentApplications(profile.getId(), 5));
-            model.addAttribute("recommendedJobs", jobService.getRecommendedJobs(profile.getSkills(), PageRequest.of(0, 5)).getContent());
-            model.addAttribute("interviewCount", applicationService.countByJobSeekerIdAndStatus(profile.getId(), Application.Status.INTERVIEW_SCHEDULED));
-            model.addAttribute("shortlistedCount", applicationService.countByJobSeekerIdAndStatus(profile.getId(), Application.Status.SHORTLISTED));
+            model.addAttribute("recommendedJobs",
+                    jobService.getRecommendedJobs(profile.getSkills(), PageRequest.of(0, 5)).getContent());
+            model.addAttribute("interviewCount", applicationService.countByJobSeekerIdAndStatus(profile.getId(),
+                    Application.Status.INTERVIEW_SCHEDULED));
+            model.addAttribute("shortlistedCount",
+                    applicationService.countByJobSeekerIdAndStatus(profile.getId(), Application.Status.SHORTLISTED));
             model.addAttribute("profileViews", 0);
+            model.addAttribute("savedJobsCount", savedJobService.getSavedJobs(profile.getId()).size());
+            model.addAttribute("recentSavedJobs",
+                    savedJobService.getSavedJobs(profile.getId()).stream().limit(3).toList());
+            model.addAttribute("profileStrength", jobSeekerService.calculateProfileStrength(profile));
         } else {
             model.addAttribute("applicationCount", 0);
             model.addAttribute("recentApplications", java.util.Collections.emptyList());
             model.addAttribute("interviewCount", 0);
             model.addAttribute("shortlistedCount", 0);
             model.addAttribute("profileViews", 0);
+            model.addAttribute("savedJobsCount", 0);
+            model.addAttribute("profileStrength", 0);
         }
-        
+
         return "job-seeker/dashboard";
     }
 
@@ -53,7 +63,7 @@ public class JobSeekerController {
     public String profileForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByEmail(userDetails.getUsername());
         JobSeeker profile = jobSeekerService.getProfile(user.getId());
-        
+
         if (profile == null) {
             model.addAttribute("profileDTO", new JobSeekerProfileDTO());
         } else {
@@ -69,16 +79,16 @@ public class JobSeekerController {
             model.addAttribute("profileDTO", dto);
             model.addAttribute("profile", profile);
         }
-        
+
         return "job-seeker/profile";
     }
 
     @PostMapping("/profile")
     public String updateProfile(@AuthenticationPrincipal UserDetails userDetails,
-                               @Valid @ModelAttribute("profileDTO") JobSeekerProfileDTO dto,
-                               BindingResult result,
-                               RedirectAttributes redirectAttributes) {
-        
+            @Valid @ModelAttribute("profileDTO") JobSeekerProfileDTO dto,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+
         if (result.hasErrors()) {
             return "job-seeker/profile";
         }
@@ -102,9 +112,9 @@ public class JobSeekerController {
 
     @PostMapping("/profile/resume")
     public String uploadResume(@AuthenticationPrincipal UserDetails userDetails,
-                              @RequestParam("resume") MultipartFile file,
-                              RedirectAttributes redirectAttributes) {
-        
+            @RequestParam("resume") MultipartFile file,
+            RedirectAttributes redirectAttributes) {
+
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             jobSeekerService.uploadResume(user.getId(), file);
@@ -118,9 +128,9 @@ public class JobSeekerController {
 
     @PostMapping("/profile/picture")
     public String uploadPicture(@AuthenticationPrincipal UserDetails userDetails,
-                               @RequestParam("picture") MultipartFile file,
-                               RedirectAttributes redirectAttributes) {
-        
+            @RequestParam("picture") MultipartFile file,
+            RedirectAttributes redirectAttributes) {
+
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             jobSeekerService.uploadProfilePicture(user.getId(), file);
@@ -136,12 +146,42 @@ public class JobSeekerController {
     public String applications(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByEmail(userDetails.getUsername());
         JobSeeker profile = jobSeekerService.getProfile(user.getId());
-        
+
         if (profile != null) {
             model.addAttribute("applications", applicationService.getJobSeekerApplications(profile.getId()));
         }
-        
+
         return "job-seeker/applications";
+    }
+
+    @GetMapping("/saved-jobs")
+    public String savedJobs(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        JobSeeker profile = jobSeekerService.getProfile(user.getId());
+
+        if (profile != null) {
+            model.addAttribute("savedJobs", savedJobService.getSavedJobs(profile.getId()));
+        }
+
+        return "job-seeker/saved-jobs";
+    }
+
+    @PostMapping("/saved-jobs/toggle/{jobId}")
+    @ResponseBody
+    public String toggleSaveJob(@PathVariable Long jobId, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        JobSeeker profile = jobSeekerService.getProfile(user.getId());
+
+        if (profile == null)
+            return "error";
+
+        if (savedJobService.isJobSaved(profile.getId(), jobId)) {
+            savedJobService.unsaveJob(profile.getId(), jobId);
+            return "removed";
+        } else {
+            savedJobService.saveJob(profile.getId(), jobId);
+            return "saved";
+        }
     }
 
     @GetMapping("/apply/{jobId}")
@@ -151,19 +191,19 @@ public class JobSeekerController {
 
     @PostMapping("/apply/{jobId}")
     public String apply(@PathVariable Long jobId,
-                       @AuthenticationPrincipal UserDetails userDetails,
-                       @ModelAttribute ApplicationCreateDTO dto,
-                       RedirectAttributes redirectAttributes) {
-        
+            @AuthenticationPrincipal UserDetails userDetails,
+            @ModelAttribute ApplicationCreateDTO dto,
+            RedirectAttributes redirectAttributes) {
+
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             JobSeeker profile = jobSeekerService.getProfile(user.getId());
-            
+
             if (profile == null) {
                 redirectAttributes.addFlashAttribute("error", "Please complete your profile first");
                 return "redirect:/job-seeker/profile";
             }
-            
+
             applicationService.apply(profile.getId(), jobId, dto);
             redirectAttributes.addFlashAttribute("success", "Application submitted successfully!");
         } catch (Exception e) {
@@ -175,9 +215,9 @@ public class JobSeekerController {
 
     @PostMapping("/applications/{id}/withdraw")
     public String withdraw(@PathVariable Long id,
-                          @AuthenticationPrincipal UserDetails userDetails,
-                          RedirectAttributes redirectAttributes) {
-        
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             JobSeeker profile = jobSeekerService.getProfile(user.getId());
@@ -192,10 +232,10 @@ public class JobSeekerController {
 
     @PostMapping("/applications/{id}/reschedule")
     public String requestReschedule(@PathVariable Long id,
-                                    @RequestParam String reason,
-                                    @AuthenticationPrincipal UserDetails userDetails,
-                                    RedirectAttributes redirectAttributes) {
-        
+            @RequestParam String reason,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
         try {
             User user = userService.findByEmail(userDetails.getUsername());
             JobSeeker profile = jobSeekerService.getProfile(user.getId());

@@ -3,54 +3,164 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/dashboard}">
 <head>
-    <title>My Profile</title>
+    <title>My Professional Profile | JobPortal</title>
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 </head>
 <body>
-<main layout:fragment="content">
-    <h2 class="mb-4">My Profile</h2>
+<main layout:fragment="content" class="bg-light p-4 p-lg-5">
+    <!-- Header Section -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">My Profile</h2>
+            <p class="text-muted mb-0">Manage your highlights, skills, and personal information to stand out to recruiters.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="badge bg-soft-success text-success px-3 py-2 rounded-pill">
+                <i class="bi bi-shield-check me-1"></i>Profile Verified
+            </div>
+        </div>
+    </div>
     
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-soft-success border-0 rounded-3 small mb-4">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}">Profile updated successfully</span>
+    </div>
+    <div th:if="${error}" class="alert alert-soft-danger border-0 rounded-3 small mb-4">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        <span th:text="${error}">An error occurred</span>
+    </div>
     
-    <form th:action="@{/job-seeker/profile}" th:object="${profileDTO}" method="post">
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Personal Information</h5>
-                <div class="mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" class="form-control" th:field="*{fullName}">
+    <form id="profileForm" th:action="@{/job-seeker/profile}" th:object="${profileDTO}" method="post">
+        <div class="row g-4">
+            <!-- Left Side: Basic Info & About -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <div class="card-header bg-white border-0 p-4 pb-0">
+                        <h5 class="fw-bold mb-0">Personal Highlights</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Full Legal Name</label>
+                            <input type="text" class="form-control form-control-premium" th:field="*{fullName}" placeholder="John Doe" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Professional Summary</label>
+                            <div id="aboutEditor" style="height: 250px;"></div>
+                            <input type="hidden" th:field="*{about}" id="aboutInput">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-0">
+                                <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Contact Phone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-left-3"><i class="bi bi-telephone text-muted"></i></span>
+                                    <input type="text" class="form-control form-control-premium rounded-left-0" th:field="*{phone}" placeholder="+1 234 567 890">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-0">
+                                <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Current Location</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-left-3"><i class="bi bi-geo-alt text-muted"></i></span>
+                                    <input type="text" class="form-control form-control-premium rounded-left-0" th:field="*{location}" placeholder="City, Country">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Phone</label>
-                    <input type="text" class="form-control" th:field="*{phone}">
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-0">
+                    <div class="card-header bg-white border-0 p-4 pb-0">
+                        <h5 class="fw-bold mb-0">Education & Technical Skills</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Core Skills (Comma separated)</label>
+                            <textarea class="form-control form-control-premium" th:field="*{skills}" rows="2" placeholder="Java, Spring Boot, UI/UX, React..."></textarea>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Educational Background</label>
+                            <textarea class="form-control form-control-premium" th:field="*{education}" rows="3" placeholder="Describe your degrees and certifications..."></textarea>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Location</label>
-                    <input type="text" class="form-control" th:field="*{location}">
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary px-5 py-3 rounded-pill fw-bold shadow-sm">
+                        <i class="bi bi-check2-circle me-2"></i>Save Final Profile
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Side: Profile Strength/Quick View -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4 p-4 text-center">
+                    <div class="mb-4">
+                        <div class="position-relative d-inline-block">
+                            <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                                <i class="bi bi-person fs-1"></i>
+                            </div>
+                            <button class="btn btn-sm btn-white shadow-sm rounded-circle position-absolute bottom-0 end-0 border" style="width: 32px; height: 32px; padding: 0;">
+                                <i class="bi bi-camera"></i>
+                            </button>
+                        </div>
+                        <h5 class="fw-bold mb-1" th:text="${profileDTO?.fullName ?: 'User'}">John Doe</h5>
+                        <p class="text-muted small mb-0">Public Profile Link Available</p>
+                    </div>
+                    
+                    <hr class="my-4 text-muted opacity-25">
+                    
+                    <div class="text-start">
+                        <label class="form-label small fw-bold text-muted text-uppercase tracking-wider d-block mb-3">Profile Completion</label>
+                        <div class="progress rounded-pill mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="smaller fw-bold text-success">Advanced</span>
+                            <span class="smaller text-muted">85%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-magic me-2"></i>Profile Perfection</h6>
+                    <p class="smaller mb-0 opacity-75">Users with rich "Professional Summaries" are 5x more likely to be contacted by headhunters. Keep it concise but impact-heavy.</p>
                 </div>
             </div>
         </div>
-        
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Professional Details</h5>
-                <div class="mb-3">
-                    <label class="form-label">Skills</label>
-                    <textarea class="form-control" th:field="*{skills}" rows="3"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Education</label>
-                    <textarea class="form-control" th:field="*{education}" rows="3"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">About</label>
-                    <textarea class="form-control" th:field="*{about}" rows="3"></textarea>
-                </div>
-            </div>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Save Profile</button>
     </form>
 </main>
+
+<th:block layout:fragment="scripts">
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const quill = new Quill('#aboutEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['clean']
+                    ]
+                }
+            });
+
+            // Set initial content
+            const initialAbout = /*[[${profileDTO?.about}]]*/ '';
+            if (initialAbout) {
+                quill.root.innerHTML = initialAbout;
+            }
+
+            // Sync on form submit
+            const form = document.getElementById('profileForm');
+            form.onsubmit = function() {
+                document.getElementById('aboutInput').value = quill.root.innerHTML;
+            };
+        });
+    </script>
+</th:block>
 </body>
 </html>

@@ -38,6 +38,11 @@
                 </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
+                <a class="nav-link" th:href="@{/messages}" data-title="Messages">
+                    <i class="bi bi-chat-dots"></i><span>Messages</span>
+                </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('JOB_SEEKER')">
                 <a class="nav-link" th:href="@{/jobs}" data-title="Find Jobs">
                     <i class="bi bi-search"></i><span>Find Jobs</span>
                 </a>
@@ -63,7 +68,11 @@
                     <i class="bi bi-people"></i><span>Applications</span>
                 </a>
             </li>
-            
+            <li class="nav-item" sec:authorize="hasRole('RECRUITER')">
+                <a class="nav-link" th:href="@{/messages}" data-title="Messages">
+                    <i class="bi bi-chat-dots"></i><span>Messages</span>
+                </a>
+            </li>
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                 <a class="nav-link" th:href="@{/admin/dashboard}" data-title="Dashboard">
                     <i class="bi bi-speedometer2"></i><span>Dashboard</span>

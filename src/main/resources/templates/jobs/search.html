@@ -3,49 +3,255 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Search Jobs</title>
+    <title>Search Jobs | JobPortal</title>
 </head>
 <body>
-<main layout:fragment="content">
-    <div class="container py-5">
-        <h2 class="mb-4">Search Results</h2>
-        
-        <form th:action="@{/jobs/search}" th:object="${search}" method="get" class="mb-4">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <input type="text" class="form-control" name="keyword" th:field="*{keyword}" placeholder="Keyword">
+<main layout:fragment="content" class="bg-light">
+    <!-- Search Header -->
+    <div class="header-gradient py-5 mb-5 shadow-sm">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 text-center text-lg-start">
+                    <h1 class="fw-bold text-dark mb-2 display-5">Find Your <span class="text-primary-gradient">Dream Job</span></h1>
+                    <p class="text-secondary mb-4 fs-5 opacity-75">Connect with top employers and discover your next career milestone.</p>
                 </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control" name="location" th:field="*{location}" placeholder="Location">
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" name="categoryId">
-                        <option value="">All Categories</option>
-                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">Search</button>
-                </div>
-            </div>
-        </form>
-        
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
-                <div class="card h-100 job-card hover-shadow">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none">Job Title</a>
-                        </h5>
-                        <p class="text-muted" th:text="${job.recruiter?.companyName}">Company</p>
-                        <div class="mb-2">
-                            <span class="badge bg-light text-dark" th:text="${job.location}">Location</span>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="bg-white p-2 rounded-4 shadow-sm border">
+                        <div class="d-flex align-items-center px-3 py-2">
+                            <div class="icon-box-sm bg-soft-primary rounded-circle me-3"><i class="bi bi-briefcase text-primary"></i></div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold text-dark small">New Jobs Daily</div>
+                                <div class="text-muted smaller">Stay updated with fresh postings</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="container pb-5">
+        <div class="row g-4">
+            <!-- Mobile Filter Toggle -->
+            <div class="d-lg-none mb-3">
+                <button class="btn btn-white w-100 border shadow-sm d-flex justify-content-between align-items-center py-3 px-4 rounded-3" 
+                        type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                    <span class="fw-bold"><i class="bi bi-funnel me-2 text-primary"></i>Filters</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+            </div>
+
+            <!-- Sidebar Filters -->
+            <div class="col-lg-3 collapse d-lg-block" id="filterCollapse">
+                <form th:action="@{/jobs/search}" th:object="${search}" method="get" id="searchForm">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 filter-card-premium sticky-top" style="top: 100px;">
+                        <div class="d-flex align-items-center mb-4">
+                            <i class="bi bi-funnel text-primary me-2 fs-5"></i>
+                            <h5 class="fw-bold mb-0">Refine Search</h5>
+                        </div>
+
+                        <!-- Keyword Search -->
+                        <div class="mb-4 pb-4 border-bottom border-light">
+                            <label class="form-label small fw-bold text-uppercase tracking-wider text-muted mb-3">Keywords</label>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-3"><i class="bi bi-search text-muted small"></i></span>
+                                    <input type="text" class="form-control form-control-premium rounded-start-0 py-2 border-0 bg-light" name="keyword" th:field="*{keyword}" placeholder="Job title...">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3"><i class="bi bi-geo-alt text-muted small"></i></span>
+                                <input type="text" class="form-control form-control-premium rounded-start-0 py-2 border-0 bg-light" name="location" th:field="*{location}" placeholder="City...">
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-4 pb-4 border-bottom border-light">
+                            <label class="form-label small fw-bold text-uppercase tracking-wider text-muted mb-3">Category</label>
+                            <select class="form-select form-select-premium py-2 border-0 bg-light" name="categoryId" th:field="*{categoryId}">
+                                <option value="">All Categories</option>
+                                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                            </select>
+                        </div>
+
+                        <!-- Job Type -->
+                        <div class="mb-4 pb-4 border-bottom border-light">
+                            <label class="form-label small fw-bold text-uppercase tracking-wider text-muted mb-3">Job Type</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check p-0" th:each="type : ${T(com.recruitment.model.Job.JobType).values()}">
+                                    <input class="btn-check" type="radio" name="jobType" th:id="${'type_' + type}" 
+                                           th:value="${type}" th:field="*{jobType}">
+                                    <label class="btn btn-soft-light-premium btn-sm rounded-pill px-3" th:for="${'type_' + type}" 
+                                           th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(type, '_', ' ')))}">Full Time</label>
+                                </div>
+                                <div class="form-check p-0">
+                                    <input class="btn-check" type="radio" value="" th:field="*{jobType}" id="type_all">
+                                    <label class="btn btn-soft-light-premium btn-sm rounded-pill px-3" for="type_all">All</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Experience Level -->
+                        <div class="mb-4 pb-4 border-bottom border-light">
+                            <label class="form-label small fw-bold text-uppercase tracking-wider text-muted mb-3">Experience</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="form-check p-0" th:each="level : ${T(com.recruitment.model.Job.ExperienceLevel).values()}">
+                                    <input class="btn-check" type="radio" name="experienceLevel" th:id="${'level_' + level}" 
+                                           th:value="${level}" th:field="*{experienceLevel}">
+                                    <label class="btn btn-soft-light-premium btn-sm rounded-pill px-3" th:for="${'level_' + level}" 
+                                           th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(level, '_', ' ')))}">Entry</label>
+                                </div>
+                                <div class="form-check p-0">
+                                    <input class="btn-check" type="radio" value="" th:field="*{experienceLevel}" id="level_all">
+                                    <label class="btn btn-soft-light-premium btn-sm rounded-pill px-3" for="level_all">All</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salary Range -->
+                        <div class="mb-4 pb-4">
+                            <label class="form-label small fw-bold text-uppercase tracking-wider text-muted mb-3">Min Salary</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 text-muted small">$</span>
+                                <input type="number" class="form-control form-control-premium py-2 border-0 bg-light" name="salaryMin" th:field="*{salaryMin}" placeholder="Minimum">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">Apply Filters</button>
+                            <a th:href="@{/jobs/search}" class="btn btn-link text-muted btn-sm text-decoration-none border-0 p-0 fw-bold">Clear All</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Job Listings -->
+            <div class="col-lg-9">
+                <div class="d-md-flex justify-content-between align-items-center mb-4">
+                    <div class="result-count mb-3 mb-md-0 d-flex align-items-center">
+                        <span class="bg-white px-3 py-1 rounded-pill shadow-sm small border">
+                            <i class="bi bi-check2-all text-success me-1"></i> <span class="fw-bold text-dark" th:text="${jobs.totalElements}">0</span> jobs found
+                        </span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-white btn-sm border-0 shadow-sm rounded-pill px-4 py-2 dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-sort-down me-2 text-primary"></i>Sort by: Newest
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 p-2 mt-2">
+                            <li><a class="dropdown-item active rounded-3 p-2 px-3 fw-bold small mb-1" href="#">Newest</a></li>
+                            <li><a class="dropdown-item rounded-3 p-2 px-3 small mb-1" href="#">Oldest</a></li>
+                            <li><a class="dropdown-item rounded-3 p-2 px-3 small" href="#">Salary: High to Low</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Job List -->
+                <div th:if="${jobs.empty}" class="bg-white border-0 shadow-sm rounded-4 py-5 px-4 text-center mb-4">
+                    <div class="bg-soft-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                        <i class="bi bi-search text-primary fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">No matches found</h4>
+                    <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">We couldn't find any jobs matching your current filters. Try broadening your search or clearing filters.</p>
+                    <a th:href="@{/jobs/search}" class="btn btn-primary px-5 py-2 rounded-pill shadow-sm">Clear all filters</a>
+                </div>
+
+                <div class="row g-4 search-job-list">
+                    <div class="col-lg-6 col-md-6 mb-4" th:each="job : ${jobs}">
+                        <a th:href="@{/jobs/{id}(id=${job.id})}" class="card border-0 shadow-sm rounded-4 premium-job-card h-100 transition-all text-decoration-none">
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div class="job-card-logo-box flex-shrink-0">
+                                        <img th:if="${job.recruiter?.companyLogo}" th:src="@{'/uploads/logos/' + ${job.recruiter.companyLogo}}" 
+                                             th:alt="${job.recruiter.companyName}" class="img-fluid" style="max-height: 40px;" />
+                                        <i th:unless="${job.recruiter?.companyLogo}" class="bi bi-buildings-fill fs-2 text-primary"></i>
+                                    </div>
+                                    <span class="job-badge-soft bg-soft-success align-self-start">
+                                        [[${#strings.capitalize(#strings.toLowerCase(#strings.replace(job.jobType, '_', ' ')))}]]
+                                    </span>
+                                </div>
+                                <h5 class="fw-bold mb-1">
+                                    <span class="text-dark text-truncate d-block" th:text="${job.title}">Job Title</span>
+                                </h5>
+                                <div class="text-primary fw-medium small mb-3">
+                                    [[${job.recruiter?.companyName}]]
+                                    <i th:if="${job.recruiter?.verified}" class="bi bi-patch-check-fill ms-1 small"></i>
+                                </div>
+                                        </div>
+
+                                <div class="d-flex flex-wrap gap-x-3 gap-y-2 mb-4 text-muted small">
+                                    <span class="d-flex align-items-center"><i class="bi bi-geo-alt me-1 text-primary"></i> [[${job.location}]]</span>
+                                    <span class="d-flex align-items-center"><i class="bi bi-calendar3 me-1 text-primary"></i> 2 days ago</span>
+                                </div>
+                                
+                                <div class="mt-auto border-top pt-3 d-flex justify-content-between align-items-center">
+                                    <div class="fw-bold text-dark">
+                                        <span th:text="${job.salaryMin != null ? #numbers.formatCurrency(job.salaryMin) : ''}">$80k</span>
+                                        <span th:if="${job.salaryMin != null}" class="text-muted small fw-normal mx-1">-</span>
+                                        <span th:text="${job.salaryMax != null ? #numbers.formatCurrency(job.salaryMax) : 'Competitive'}">$120k</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <!-- Save Button -->
+                                        <button th:if="${#authorization.expression('hasRole(''JOB_SEEKER'')')}" 
+                                                class="btn btn-light btn-sm rounded-circle shadow-none border d-flex align-items-center justify-content-center p-0" 
+                                                style="width: 38px; height: 38px;"
+                                                th:classappend="${savedJobIds != null && savedJobIds.contains(job.id)} ? 'text-warning' : 'text-muted'"
+                                                th:onclick="'event.preventDefault(); toggleSave(this, ' + ${job.id} + ')'">
+                                            <i class="bi fs-5" th:classappend="${savedJobIds != null && savedJobIds.contains(job.id)} ? 'bi-bookmark-fill' : 'bi-bookmark'"></i>
+                                        </button>
+                                        <span class="btn btn-sm px-3 rounded-pill btn-apply-soft">View Details</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav th:if="${jobs.totalPages > 1}" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${jobs.first ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/jobs/search(page=${jobs.number - 1}, keyword=${search.keyword}, location=${search.location}, categoryId=${search.categoryId}, jobType=${search.jobType}, experienceLevel=${search.experienceLevel}, salaryMin=${search.salaryMin})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, jobs.totalPages - 1)}" th:classappend="${jobs.number == i ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/jobs/search(page=${i}, keyword=${search.keyword}, location=${search.location}, categoryId=${search.categoryId}, jobType=${search.jobType}, experienceLevel=${search.experienceLevel}, salaryMin=${search.salaryMin})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${jobs.last ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/jobs/search(page=${jobs.number + 1}, keyword=${search.keyword}, location=${search.location}, categoryId=${search.categoryId}, jobType=${search.jobType}, experienceLevel=${search.experienceLevel}, salaryMin=${search.salaryMin})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
 </main>
+
+<script layout:fragment="script">
+    function toggleSave(btn, jobId) {
+        fetch('/job-seeker/saved-jobs/toggle/' + jobId, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            }
+        }).then(response => response.text())
+        .then(data => {
+            const icon = btn.querySelector('i');
+            if (data === 'saved') {
+                btn.classList.remove('text-muted');
+                btn.classList.add('text-warning');
+                icon.classList.remove('bi-bookmark');
+                icon.classList.add('bi-bookmark-fill');
+            } else if (data === 'removed') {
+                btn.classList.add('text-muted');
+                btn.classList.remove('text-warning');
+                icon.classList.add('bi-bookmark');
+                icon.classList.remove('bi-bookmark-fill');
+            }
+        });
+    }
+</script>
 </body>
 </html>

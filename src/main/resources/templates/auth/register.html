@@ -3,66 +3,86 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Register</title>
+    <title>Create Your Account | JobPortal</title>
 </head>
 <body>
-<main layout:fragment="content">
-    <div class="container py-5">
+<main layout:fragment="content" class="bg-light min-vh-100 d-flex align-items-center py-5">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-7">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="text-center mb-4">Create Account</h2>
+            <div class="col-lg-10 col-xl-8">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="row g-0">
+                        <!-- Left Side: Branding/Image (Hidden on mobile) -->
+                        <div class="col-md-5 d-none d-md-block bg-primary p-5 text-white d-flex flex-column justify-content-center">
+                            <h2 class="fw-bold mb-4">Join Our Community</h2>
+                            <p class="lead mb-4">Start your journey today. Whether you're looking for your next career move or seeking world-class talent, we've got you covered.</p>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Access to 10k+ premium jobs</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-0">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span>Post jobs and manage candidates</span>
+                            </div>
+                        </div>
                         
-                        <form th:action="@{/register}" th:object="${registration}" method="post">
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">I want to:</label>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="form-check card p-3">
-                                            <input class="form-check-input" type="radio" th:field="*{role}" value="JOB_SEEKER" id="seeker">
-                                            <label class="form-check-label d-block" for="seeker">
-                                                <i class="bi bi-person-badge display-6 d-block mb-2"></i>
-                                                <strong>Find a Job</strong>
+                        <!-- Right Side: Form -->
+                        <div class="col-md-7 p-4 p-lg-5 bg-white">
+                            <div class="mb-5">
+                                <h3 class="fw-bold text-dark">Get Started</h3>
+                                <p class="text-muted">Create your professional account in seconds.</p>
+                            </div>
+                            
+                            <form th:action="@{/register}" th:object="${registration}" method="post">
+                                <div class="mb-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase tracking-wider mb-3">Choose Your Path</label>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <input class="form-check-input d-none" type="radio" th:field="*{role}" value="JOB_SEEKER" id="role_seeker" required>
+                                            <label class="form-check-label d-block text-center auth-role-card p-4 rounded-4 bg-light border" for="role_seeker">
+                                                <i class="bi bi-person-badge fs-2 d-block mb-2 text-primary"></i>
+                                                <span class="fw-bold d-block">Seeker</span>
+                                                <small class="text-muted smaller">Finding Work</small>
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <input class="form-check-input d-none" type="radio" th:field="*{role}" value="RECRUITER" id="role_recruiter" required>
+                                            <label class="form-check-label d-block text-center auth-role-card p-4 rounded-4 bg-light border" for="role_recruiter">
+                                                <i class="bi bi-building fs-2 d-block mb-2 text-primary"></i>
+                                                <span class="fw-bold d-block">Recruiter</span>
+                                                <small class="text-muted smaller">Hiring Talent</small>
                                             </label>
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="form-check card p-3">
-                                            <input class="form-check-input" type="radio" th:field="*{role}" value="RECRUITER" id="recruiter">
-                                            <label class="form-check-label d-block" for="recruiter">
-                                                <i class="bi bi-building display-6 d-block mb-2"></i>
-                                                <strong>Hire Talent</strong>
-                                            </label>
-                                        </div>
+                                    <span th:errors="*{role}" class="text-danger smaller mt-2 d-block"></span>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Email Address</label>
+                                    <input type="email" th:field="*{email}" class="form-control form-control-premium" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" placeholder="name@company.com" required>
+                                    <span th:errors="*{email}" class="invalid-feedback fw-medium mt-2"></span>
+                                </div>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Password</label>
+                                        <input type="password" th:field="*{password}" class="form-control form-control-premium" placeholder="••••••••" required>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Confirm</label>
+                                        <input type="password" th:field="*{confirmPassword}" class="form-control form-control-premium" placeholder="••••••••" required>
                                     </div>
                                 </div>
-                                <span th:errors="*{role}" class="text-danger small"></span>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" th:field="*{email}" class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
-                                <span th:errors="*{email}" class="invalid-feedback"></span>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" th:field="*{password}" class="form-control">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Confirm Password</label>
-                                    <input type="password" th:field="*{confirmPassword}" class="form-control">
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary w-100">Create Account</button>
-                        </form>
-                        
-                        <p class="text-center mt-3 mb-0">
-                            Already have an account? <a th:href="@{/login}">Login</a>
-                        </p>
+                                
+                                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-4 mt-2">
+                                    Create My Account <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                                
+                                <p class="text-center text-muted mb-0 small fw-medium">
+                                    Already part of us? <a th:href="@{/login}" class="text-primary text-decoration-none fw-bold">Login Here</a>
+                                </p>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

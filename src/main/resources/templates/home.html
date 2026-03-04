@@ -3,80 +3,231 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Find Your Dream Job</title>
+    <title>Find Your Dream Job | JobPortal</title>
 </head>
 <body>
 <main layout:fragment="content">
-    <section class="hero-section py-5 bg-primary text-white">
+    <!-- Hero Section -->
+    <section class="hero-section text-white py-5">
         <div class="container py-5">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">Find Your Dream Job Today</h1>
-                    <p class="lead mb-4">Connect with top employers and discover opportunities that match your skills and ambitions.</p>
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <h1 class="hero-title mb-4">Discover Your <span class="text-info">Perfect Career</span> Match.</h1>
+                    <p class="lead mb-5 opacity-75 fs-5">Join 10,000+ professionals finding careers that match their skills and ambitions. The next chapter of your success starts here.</p>
                     
-                    <form th:action="@{/jobs/search}" method="get" class="bg-white p-3 rounded shadow">
-                        <div class="row g-2">
-                            <div class="col-md-5">
-                                <input type="text" class="form-control form-control-lg" name="keyword" placeholder="Job title or keyword">
+                    <div class="search-pill d-none d-md-block">
+                        <form th:action="@{/jobs/search}" method="get" class="row g-0 align-items-center">
+                            <div class="col-md-5 ps-3 border-end">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-0 text-muted px-2">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" name="keyword" placeholder="Job title, keyword...">
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <input type="text" class="form-control form-control-lg" name="location" placeholder="Location">
+                            <div class="col-md-4 ps-3">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-0 text-muted px-2">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </span>
+                                    <input type="text" class="form-control" name="location" placeholder="City or remote">
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="bi bi-search me-1"></i>Search
+                            <div class="col-md-3 p-1">
+                                <button type="submit" class="btn btn-primary w-100 shadow-none">
+                                    Find Jobs
                                 </button>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                    
+                    <!-- Mobile Search Placeholder -->
+                    <div class="d-md-none">
+                        <a th:href="@{/jobs}" class="btn btn-light btn-lg w-100 rounded-pill fw-bold py-3">
+                            <i class="bi bi-search me-2"></i>Start Your Search
+                        </a>
+                    </div>
+
+                    <div class="mt-4 opacity-75 small">
+                        <span class="me-3 fw-bold">Popular:</span>
+                        <a href="#" class="text-white text-decoration-none me-2">Software</a>,
+                        <a href="#" class="text-white text-decoration-none me-2">Design</a>,
+                        <a href="#" class="text-white text-decoration-none">Marketing</a>
+                    </div>
                 </div>
-                <div class="col-lg-6 d-none d-lg-block text-center">
-                    <i class="bi bi-briefcase display-1"></i>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="position-relative">
+                        <div class="bg-white rounded-circle p-4 shadow-lg position-absolute top-0 start-0 translate-middle-y mt-5 rotate-n15" style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-google text-primary fs-1"></i>
+                        </div>
+                        <div class="bg-white rounded-circle p-4 shadow-lg position-absolute bottom-0 end-0 translate-middle mt-5 rotate-15" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-meta text-info fs-2"></i>
+                        </div>
+                        <div class="bg-white p-2 rounded-4 shadow-lg" style="transform: perspective(1000px) rotateY(-10deg);">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop" class="img-fluid rounded-3" alt="Job Search">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-    
-    <section class="py-5">
+
+    <!-- Stats Bar -->
+    <div class="bg-white py-4 border-bottom shadow-sm">
         <div class="container">
-            <h2 class="text-center mb-5">Browse by Category</h2>
+            <div class="row text-center g-4">
+                <div class="col-md-3 col-6">
+                    <h3 class="fw-bold mb-0">12K+</h3>
+                    <p class="text-muted small text-uppercase fw-bold mb-0">Live Jobs</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h3 class="fw-bold mb-0">8K+</h3>
+                    <p class="text-muted small text-uppercase fw-bold mb-0">Companies</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h3 class="fw-bold mb-0">200K+</h3>
+                    <p class="text-muted small text-uppercase fw-bold mb-0">Candidates</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h3 class="fw-bold mb-0">95%</h3>
+                    <p class="text-muted small text-uppercase fw-bold mb-0">Success Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Browse by Category -->
+    <section class="py-5 bg-light">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <span class="section-tag">Categories</span>
+                <h2 class="fw-bold display-6">Explore by <span class="text-primary">Interest</span></h2>
+                <p class="text-muted">Find the right role in the industry you love.</p>
+            </div>
             <div class="row g-4">
-                <div class="col-md-3" th:each="category : ${categories}">
+                <div class="col-xl-3 col-lg-4 col-md-6" th:each="category : ${categories}">
                     <a th:href="@{/jobs/search(categoryId=${category.id})}" class="text-decoration-none">
-                        <div class="card h-100 category-card hover-shadow">
-                            <div class="card-body text-center">
-                                <i class="bi bi-briefcase display-4 text-primary mb-3"></i>
-                                <h5 th:text="${category.name}">Category Name</h5>
+                        <div class="card h-100 feature-card border-0 shadow-sm text-center">
+                            <div class="icon-box-lg mx-auto bg-soft-primary text-primary">
+                                <i class="bi bi-lightning-charge-fill" th:if="${category.name.contains('Tech')}"></i>
+                                <i class="bi bi-graph-up-arrow" th:if="${category.name.contains('Sales') or category.name.contains('Market')}"></i>
+                                <i class="bi bi-palette-fill" th:if="${category.name.contains('Design')}"></i>
+                                <i class="bi bi-briefcase-fill" th:unless="${category.name.contains('Tech') or category.name.contains('Sales') or category.name.contains('Market') or category.name.contains('Design')}"></i>
                             </div>
+                            <h5 class="fw-bold text-dark mb-2" th:text="${category.name}">Category Name</h5>
+                            <p class="text-muted small mb-0">1.2k+ jobs opened</p>
                         </div>
                     </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- How it Works -->
+    <section class="py-5">
+        <div class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="section-tag">Process</span>
+                    <h2 class="fw-bold display-6 mb-4">Your path to <span class="text-primary">Success</span></h2>
+                    <p class="text-muted mb-5">We've simplified the journey from job search to hire. Follow these simple steps to land your next big role.</p>
+                    
+                    <div class="step-item mb-4">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h5 class="fw-bold text-dark">Create Account</h5>
+                            <p class="text-muted mb-0">Set up your professional profile in minutes with our builder.</p>
+                        </div>
+                    </div>
+                    <div class="step-item mb-4 border-start border-primary border-4">
+                        <div class="step-number">02</div>
+                        <div class="step-content px-3">
+                            <h5 class="fw-bold text-dark">Apply with 1-Click</h5>
+                            <p class="text-muted mb-0">Search through verified jobs and apply instantly with your saved resume.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h5 class="fw-bold text-dark">Get Hired</h5>
+                            <p class="text-muted mb-0">Chat directly with recruiters and schedule your interviews.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop" class="img-fluid rounded-5 shadow-lg" alt="Team Work">
+                </div>
+            </div>
+        </div>
+    </section>
     
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Recent Jobs</h2>
-                <a th:href="@{/jobs}" class="btn btn-outline-primary">View All</a>
+    <!-- Recent Jobs Section -->
+    <section class="py-5 bg-white">
+        <div class="container py-5">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+                <div>
+                    <span class="section-tag">Latest</span>
+                    <h2 class="fw-bold mb-0">Recently <span class="text-primary">Posted Jobs</span></h2>
+                </div>
+                <a th:href="@{/jobs}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+                    View All Opportunities <i class="bi bi-arrow-right ms-2"></i>
+                </a>
             </div>
             
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
-                    <div class="card h-100 job-card hover-shadow">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-decoration-none">Job Title</a>
-                            </h5>
-                            <p class="text-muted" th:text="${job.recruiter?.companyName}">Company</p>
-                            <div class="mb-2">
-                                <span class="badge bg-light text-dark me-1">
-                                    <i class="bi bi-geo-alt me-1"></i><span th:text="${job.location}">Location</span>
+            <div class="row g-4 home-job-grid">
+                <div class="col-lg-4 col-md-6" th:each="job : ${jobs}">
+                    <div class="card border-0 shadow-sm rounded-4 premium-job-card h-100 transition-all">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div class="job-card-logo-box">
+                                    <img th:if="${job.recruiter?.companyLogo}" th:src="@{'/uploads/logos/' + ${job.recruiter.companyLogo}}" 
+                                         th:alt="${job.recruiter.companyName}" class="img-fluid" style="max-height: 40px;" />
+                                    <i th:unless="${job.recruiter?.companyLogo}" class="bi bi-buildings-fill fs-2 text-primary"></i>
+                                </div>
+                                <span class="job-badge-soft bg-soft-success align-self-start">
+                                    [[${#strings.capitalize(#strings.toLowerCase(#strings.replace(job.jobType, '_', ' ')))}]]
                                 </span>
                             </div>
-                            <p class="card-text text-truncate" th:text="${job.description}">Description...</p>
+                            
+                            <h5 class="fw-bold mb-1">
+                                <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.title}" class="text-dark text-decoration-none">Job Title</a>
+                            </h5>
+                            <div class="text-primary fw-medium small mb-3">
+                                [[${job.recruiter?.companyName}]]
+                                <i th:if="${job.recruiter?.verified}" class="bi bi-patch-check-fill ms-1 small"></i>
+                            </div>
+                            
+                            <div class="d-flex flex-wrap gap-x-3 gap-y-2 mb-4 text-muted small">
+                                <span class="d-flex align-items-center"><i class="bi bi-geo-alt me-1"></i> [[${job.location}]]</span>
+                                <span class="d-flex align-items-center"><i class="bi bi-calendar3 me-1"></i> 2 days ago</span>
+                            </div>
+                            
+                            <div class="mt-auto border-top pt-3 d-flex justify-content-between align-items-center">
+                                <div class="fw-bold text-dark">
+                                    <span th:text="${job.salaryMin != null ? #numbers.formatCurrency(job.salaryMin) : ''}">$80k</span>
+                                    <span th:if="${job.salaryMin != null}" class="text-muted small fw-normal mx-1">-</span>
+                                    <span th:text="${job.salaryMax != null ? #numbers.formatCurrency(job.salaryMax) : 'Competitive'}">$120k</span>
+                                </div>
+                                <a th:href="@{/jobs/{id}(id=${job.id})}" class="btn btn-sm px-3 rounded-pill btn-apply-soft">Apply Now</a>
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-5">
+        <div class="container">
+            <div class="bg-primary rounded-5 p-5 text-center text-white shadow-lg overflow-hidden position-relative">
+                <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(circle at 10% 20%, white 0%, transparent 40%);"></div>
+                <div class="position-relative z-1 py-4">
+                    <h2 class="display-5 fw-bold mb-4">Ready to start your next chapter?</h2>
+                    <p class="lead mb-5 opacity-75 mx-auto" style="max-width: 600px;">Join thousands of employers and candidates achieving their goals with JobPortal today.</p>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <a th:href="@{/register}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold py-3 text-primary">Get Started Now</a>
+                        <a href="#" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold py-3">Learn More</a>
                     </div>
                 </div>
             </div>

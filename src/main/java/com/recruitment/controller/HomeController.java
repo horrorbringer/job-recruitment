@@ -23,6 +23,7 @@ public class HomeController {
     private final ApplicationService applicationService;
     private final JobSeekerService jobSeekerService;
     private final UserService userService;
+    private final com.recruitment.service.SavedJobService savedJobService;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -34,8 +35,8 @@ public class HomeController {
 
     @GetMapping("/jobs")
     public String jobs(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "12") int size,
-                       Model model) {
+            @RequestParam(defaultValue = "12") int size,
+            Model model) {
         Page<Job> jobs = jobService.getApprovedJobs(PageRequest.of(page, size, Sort.by("createdAt").descending()));
         model.addAttribute("jobs", jobs);
         model.addAttribute("categories", categoryRepository.findByActiveTrueOrderByNameAsc());
@@ -43,29 +44,30 @@ public class HomeController {
     }
 
     @GetMapping("/jobs/{id}")
-    public String jobDetail(@PathVariable Long id, 
-                           @AuthenticationPrincipal UserDetails userDetails,
-                           Model model) {
+    public String jobDetail(@PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
         Job job = jobService.getJob(id);
         if (job == null || job.getStatus() != Job.Status.APPROVED) {
             return "redirect:/jobs";
         }
         model.addAttribute("job", job);
-        
+
         if (userDetails != null) {
             var user = userService.findByEmail(userDetails.getUsername());
             if (user != null) {
                 boolean isJobSeeker = user.getRole() == com.recruitment.model.User.Role.JOB_SEEKER;
                 model.addAttribute("isJobSeeker", isJobSeeker);
-                
+
                 var profile = jobSeekerService.getProfile(user.getId());
                 if (profile != null) {
                     boolean alreadyApplied = applicationService.hasApplied(profile.getId(), id);
                     model.addAttribute("alreadyApplied", alreadyApplied);
+                    model.addAttribute("isSaved", savedJobService.isJobSaved(profile.getId(), id));
                 }
             }
         }
-        
+
         return "jobs/detail";
     }
 }

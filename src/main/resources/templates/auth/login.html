@@ -3,52 +3,72 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/main}">
 <head>
-    <title>Login</title>
+    <title>Login | JobPortal</title>
 </head>
 <body>
-<main layout:fragment="content">
-    <div class="container py-5">
+<main layout:fragment="content" class="bg-light min-vh-100 d-flex align-items-center py-5">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="text-center mb-4">Welcome Back</h2>
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-lg-5 bg-white">
+                        <div class="text-center mb-5">
+                            <h3 class="fw-bold text-dark">Welcome Back</h3>
+                            <p class="text-muted">Enter your credentials to access your account.</p>
+                        </div>
                         
-                        <div th:if="${param.error}" class="alert alert-danger">
+                        <div th:if="${param.error}" class="alert alert-soft-danger border-0 rounded-3 small mb-4">
+                            <i class="bi bi-exclamation-circle me-2"></i>
                             <span th:if="${session.loginError}" th:text="${session.loginError}">Invalid email or password</span>
                             <span th:unless="${session.loginError}">Invalid email or password</span>
                         </div>
                         
-                        <div th:if="${param.logout}" class="alert alert-success">
+                        <div th:if="${param.logout}" class="alert alert-soft-success border-0 rounded-3 small mb-4">
+                            <i class="bi bi-check-circle me-2"></i>
                             You have been logged out
                         </div>
                         
-                        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                        <div th:if="${success}" class="alert alert-soft-success border-0 rounded-3 small mb-4" th:text="${success}"></div>
                         
                         <form th:action="@{/login}" method="post">
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="username" class="form-control" required>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-muted text-uppercase tracking-wider">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-3"><i class="bi bi-envelope text-muted"></i></span>
+                                    <input type="email" name="username" class="form-control form-control-premium rounded-start-0" placeholder="name@example.com" required autofocus>
+                                </div>
                             </div>
                             
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control" required>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label small fw-bold text-muted text-uppercase tracking-wider mb-0">Password</label>
+                                    <a href="#" class="text-primary small fw-bold text-decoration-none">Forgot?</a>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 rounded-start-3"><i class="bi bi-lock text-muted"></i></span>
+                                    <input type="password" name="password" class="form-control form-control-premium rounded-start-0" placeholder="••••••••" required>
+                                </div>
                             </div>
                             
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
-                                <label class="form-check-label" for="remember-me">Remember me</label>
+                            <div class="mb-4 form-check d-flex align-items-center">
+                                <input type="checkbox" class="form-check-input me-2" id="remember-me" name="remember-me">
+                                <label class="form-check-label small text-muted fw-medium" for="remember-me">Keep me logged in</label>
                             </div>
                             
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mb-4">
+                                Sign In <i class="bi bi-box-arrow-in-right ms-2"></i>
+                            </button>
                         </form>
                         
-                        <p class="text-center mb-0">
-                            Don't have an account? <a th:href="@{/register}">Register</a>
+                        <p class="text-center text-muted mb-0 small fw-medium">
+                            New here? <a th:href="@{/register}" class="text-primary text-decoration-none fw-bold">Create Account</a>
                         </p>
                     </div>
                 </div>
+                
+                <p class="text-center mt-4 text-muted smaller">
+                    &copy; 2026 JobPortal. All rights reserved.
+                </p>
             </div>
         </div>
     </div>

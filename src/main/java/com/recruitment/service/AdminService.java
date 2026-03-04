@@ -23,14 +23,14 @@ public class AdminService {
 
     public Map<String, Object> getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
-        
+
         stats.put("totalJobSeekers", userRepository.countByRole(User.Role.JOB_SEEKER));
         stats.put("totalRecruiters", userRepository.countByRole(User.Role.RECRUITER));
         stats.put("totalJobs", jobRepository.count());
         stats.put("approvedJobs", jobRepository.countByStatus(Job.Status.APPROVED));
         stats.put("pendingJobs", jobRepository.countByStatus(Job.Status.PENDING));
         stats.put("totalApplications", applicationRepository.count());
-        
+
         return stats;
     }
 
@@ -38,10 +38,22 @@ public class AdminService {
         return userRepository.findAll(pageable);
     }
 
+    public Page<User> getFilteredUsers(String role, Boolean enabled, Boolean locked, Pageable pageable) {
+        User.Role userRole = null;
+        if (role != null && !role.isEmpty()) {
+            try {
+                userRole = User.Role.valueOf(role);
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid role
+            }
+        }
+        return userRepository.findFilteredUsers(userRole, enabled, locked, pageable);
+    }
+
     @Transactional
     public void toggleUserStatus(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         user.setEnabled(!user.isEnabled());
         userRepository.save(user);
     }
@@ -49,7 +61,7 @@ public class AdminService {
     @Transactional
     public void toggleUserLock(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         user.setAccountNonLocked(!user.isAccountNonLocked());
         userRepository.save(user);
     }
@@ -83,7 +95,7 @@ public class AdminService {
 
     private void updateJobStatus(Long jobId, Job.Status status) {
         Job job = jobRepository.findById(jobId)
-            .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new RuntimeException("Job not found"));
         job.setStatus(status);
         jobRepository.save(job);
     }
@@ -102,24 +114,24 @@ public class AdminService {
         if (categoryRepository.existsByNameIgnoreCase(name)) {
             throw new RuntimeException("Category already exists");
         }
-        
+
         Category category = new Category();
         category.setName(name);
         category.setDescription(description);
         category.setActive(true);
-        
+
         return categoryRepository.save(category);
     }
 
     @Transactional
     public Category updateCategory(Long id, String name, String description, boolean active) {
         Category category = categoryRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Category not found"));
-        
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
         category.setName(name);
         category.setDescription(description);
         category.setActive(active);
-        
+
         return categoryRepository.save(category);
     }
 

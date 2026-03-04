@@ -23,7 +23,7 @@ public class JobSeekerService {
     @Transactional
     public JobSeeker createProfile(Long userId, JobSeekerProfileDTO dto) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         JobSeeker profile = new JobSeeker();
         profile.setUser(user);
@@ -42,7 +42,7 @@ public class JobSeekerService {
     @Transactional
     public JobSeeker updateProfile(Long userId, JobSeekerProfileDTO dto) {
         JobSeeker profile = jobSeekerRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
 
         profile.setFullName(dto.getFullName());
         profile.setPhone(dto.getPhone());
@@ -59,7 +59,7 @@ public class JobSeekerService {
     @Transactional
     public void uploadResume(Long userId, MultipartFile file) {
         JobSeeker profile = jobSeekerRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
 
         String resumePath = fileStorageService.storeResume(file, userId);
         profile.setResume(resumePath);
@@ -69,7 +69,7 @@ public class JobSeekerService {
     @Transactional
     public void uploadProfilePicture(Long userId, MultipartFile file) {
         JobSeeker profile = jobSeekerRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
 
         String picturePath = fileStorageService.storeImage(file, userId, "profile");
         profile.setProfilePicture(picturePath);
@@ -82,5 +82,28 @@ public class JobSeekerService {
 
     public JobSeeker getProfileById(Long id) {
         return jobSeekerRepository.findById(id).orElse(null);
+    }
+
+    public int calculateProfileStrength(JobSeeker profile) {
+        if (profile == null)
+            return 0;
+        int strength = 0;
+        if (profile.getFullName() != null && !profile.getFullName().isEmpty())
+            strength += 15;
+        if (profile.getPhone() != null && !profile.getPhone().isEmpty())
+            strength += 10;
+        if (profile.getAbout() != null && !profile.getAbout().isEmpty())
+            strength += 15;
+        if (profile.getSkills() != null && !profile.getSkills().isEmpty())
+            strength += 15;
+        if (profile.getEducation() != null && !profile.getEducation().isEmpty())
+            strength += 15;
+        if (profile.getLocation() != null && !profile.getLocation().isEmpty())
+            strength += 10;
+        if (profile.getResume() != null)
+            strength += 10;
+        if (profile.getProfilePicture() != null)
+            strength += 10;
+        return strength;
     }
 }

@@ -3,45 +3,156 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/dashboard}">
 <head>
-    <title>Manage Users</title>
+    <title>User Management | commandCenter</title>
 </head>
 <body>
-<main layout:fragment="content">
-    <h2 class="mb-4">Manage Users</h2>
-    
-    <div class="card">
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Locked</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.email}">Email</td>
-                        <td th:text="${user.role}">Role</td>
-                        <td>
-                            <span class="badge" th:classappend="${user.enabled ? 'bg-success' : 'bg-danger'}" th:text="${user.enabled ? 'Active' : 'Inactive'}">Status</span>
-                        </td>
-                        <td>
-                            <span class="badge" th:classappend="${user.accountNonLocked ? 'bg-success' : 'bg-warning'}" th:text="${user.accountNonLocked ? 'Unlocked' : 'Locked'}">Locked</span>
-                        </td>
-                        <td>
-                            <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Toggle Status</button>
-                            </form>
-                            <form th:action="@{/admin/users/{id}/toggle-lock(id=${user.id})}" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-warning">Toggle Lock</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+<main layout:fragment="content" class="bg-light">
+    <!-- Header -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark mb-1">User Management</h2>
+            <p class="text-muted mb-0">Manage platform access, roles, and account security.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="btn-group shadow-sm rounded-pill">
+                <button class="btn btn-white border px-3"><i class="bi bi-file-earmark-excel me-1"></i>Excel</button>
+                <button class="btn btn-white border px-3"><i class="bi bi-file-earmark-pdf me-1"></i>PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 filter-card-premium mb-4">
+        <div class="card-body p-4">
+            <form th:action="@{/admin/users}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Role</label>
+                    <select name="role" class="form-select form-select-pill">
+                        <option value="">All Roles</option>
+                        <option value="JOB_SEEKER" th:selected="${currentRole == 'JOB_SEEKER'}">Job Seeker</option>
+                        <option value="RECRUITER" th:selected="${currentRole == 'RECRUITER'}">Recruiter</option>
+                        <option value="ADMIN" th:selected="${currentRole == 'ADMIN'}">Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Account Status</label>
+                    <select name="enabled" class="form-select form-select-pill">
+                        <option value="">Any Status</option>
+                        <option value="true" th:selected="${currentEnabled == true}">Active</option>
+                        <option value="false" th:selected="${currentEnabled == false}">Disabled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Lock State</label>
+                    <select name="locked" class="form-select form-select-pill">
+                        <option value="">Any State</option>
+                        <option value="false" th:selected="${currentLocked == false}">Unlocked</option>
+                        <option value="true" th:selected="${currentLocked == true}">Locked</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                            <i class="bi bi-funnel-fill me-1"></i> Apply
+                        </button>
+                        <a th:href="@{/admin/users}" class="btn btn-light rounded-pill px-4 fw-bold">
+                            <i class="bi bi-x-circle me-1"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">User Identity</th>
+                            <th>Platform Role</th>
+                            <th>Account Status</th>
+                            <th>Security</th>
+                            <th class="text-end pe-4">Quick Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users.content}">
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center py-2">
+                                    <div class="avatar-md bg-soft-primary text-primary rounded-circle p-2 me-3" 
+                                         style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-person-fill fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${user.email}">Email</div>
+                                        <div class="text-muted smaller">Joined [[${#temporals.format(user.createdAt, 'MMM yyyy')}]]</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill px-3" 
+                                      th:classappend="${user.role.name() == 'ADMIN'} ? 'bg-soft-danger text-danger' : 
+                                                     (${user.role.name() == 'RECRUITER'} ? 'bg-soft-success text-success' : 'bg-soft-info text-info')"
+                                      th:text="${user.role}">Role</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="rounded-circle me-2" 
+                                          th:classappend="${user.enabled} ? 'bg-success' : 'bg-danger'" 
+                                          style="width: 8px; height: 8px;"></span>
+                                    <span th:text="${user.enabled ? 'Active' : 'Disabled'}" 
+                                          th:class="${user.enabled ? 'text-success' : 'text-danger'}">Status</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span th:if="${!user.accountNonLocked}" class="badge bg-soft-warning text-warning rounded-pill px-2 small">
+                                    <i class="bi bi-lock-fill me-1"></i>Locked
+                                </span>
+                                <span th:if="${user.accountNonLocked}" class="text-muted small">
+                                    <i class="bi bi-shield-check me-1"></i>Secure
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-light border-0 px-3 py-2 rounded-start" 
+                                                th:title="${user.enabled ? 'Disable Account' : 'Enable Account'}">
+                                            <i class="bi" th:classappend="${user.enabled} ? 'bi-person-x text-danger' : 'bi-person-check text-success'"></i>
+                                        </button>
+                                    </form>
+                                    <form th:action="@{/admin/users/{id}/toggle-lock(id=${user.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-light border-0 px-3 py-2 rounded-end"
+                                                th:title="${user.accountNonLocked ? 'Lock Account' : 'Unlock Account'}">
+                                            <i class="bi" th:classappend="${user.accountNonLocked} ? 'bi-lock text-warning' : 'bi-unlock text-primary'"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-4 border-top" th:if="${users.totalPages > 1}">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+                            <a class="page-link rounded-pill px-3 me-2" th:href="@{/admin/users(page=${users.number - 1}, role=${currentRole}, enabled=${currentEnabled}, locked=${currentLocked})}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}"
+                            th:classappend="${i == users.number} ? 'active'">
+                            <a class="page-link rounded-pill mx-1" th:href="@{/admin/users(page=${i}, role=${currentRole}, enabled=${currentEnabled}, locked=${currentLocked})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                            <a class="page-link rounded-pill px-3 ms-2" th:href="@{/admin/users(page=${users.number + 1}, role=${currentRole}, enabled=${currentEnabled}, locked=${currentLocked})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </main>
