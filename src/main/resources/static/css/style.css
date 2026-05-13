@@ -1496,3 +1496,58 @@ tr:hover .job-icon-box {
 .btn-white.is-loading::after {
     border-color: #2563eb transparent #2563eb transparent;
 }
+
+/* Kanban Board Styles */
+.kanban-board {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.kanban-board::-webkit-scrollbar {
+    height: 8px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+}
+
+.kanban-column {
+    min-width: 320px;
+    max-width: 320px;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+
+.kanban-dropzone {
+    min-height: 200px;
+}
+
+.kanban-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: grab;
+    border: 2px solid transparent !important;
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+}
+
+.kanban-card.sortable-ghost {
+    opacity: 0.4;
+    background-color: #f8fafc;
+    border: 2px dashed #94a3b8 !important;
+}
+
+.kanban-card.sortable-drag {
+    background-color: white !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    transform: rotate(2deg);
+}

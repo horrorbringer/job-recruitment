@@ -123,9 +123,23 @@
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4">
+                <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 mb-4">
                     <h6 class="fw-bold mb-3"><i class="bi bi-magic me-2"></i>Profile Perfection</h6>
                     <p class="smaller mb-0 opacity-75">Users with rich "Professional Summaries" are 5x more likely to be contacted by headhunters. Keep it concise but impact-heavy.</p>
+                </div>
+
+                <!-- PDF Resume Generator Card -->
+                <div class="card border border-light shadow-sm rounded-4 overflow-hidden text-center bg-white p-4">
+                    <div class="mb-3">
+                        <div class="bg-soft-danger text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-file-earmark-pdf fs-3"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">ATS-Friendly Resume</h6>
+                        <p class="text-muted smaller mb-0">Instantly generate a beautiful PDF resume based on your profile highlights to share anywhere.</p>
+                    </div>
+                    <a th:href="@{/job-seeker/resume/generate}" target="_blank" class="btn btn-outline-danger shadow-sm rounded-pill fw-bold w-100 py-2">
+                        <i class="bi bi-download me-2"></i>Download PDF
+                    </a>
                 </div>
             </div>
         </div>

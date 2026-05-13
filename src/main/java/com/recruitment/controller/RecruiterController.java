@@ -60,7 +60,7 @@ public class RecruiterController {
 
     @GetMapping("/applications")
     public String allApplications(@RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "100") int size,
             Model model,
             @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByEmail(userDetails.getUsername());
@@ -72,7 +72,27 @@ public class RecruiterController {
         Page<Application> applications = applicationService.getByRecruiterId(
                 profile.getId(), PageRequest.of(page, size, Sort.by("createdAt").descending()));
 
-        model.addAttribute("applications", applications);
+        java.util.List<Application> appList = applications.getContent();
+        model.addAttribute("applications", appList);
+
+        // Per-column counts for Kanban empty-state rendering (Thymeleaf doesn't support
+        // lambdas)
+        model.addAttribute("appliedCount",
+                appList.stream().filter(
+                        a -> a.getStatus() == Application.Status.APPLIED || a.getStatus() == Application.Status.VIEWED)
+                        .count());
+        model.addAttribute("reviewCount",
+                appList.stream().filter(a -> a.getStatus() == Application.Status.SHORTLISTED).count());
+        model.addAttribute("interviewCount",
+                appList.stream().filter(a -> a.getStatus() == Application.Status.INTERVIEW_SCHEDULED
+                        || a.getStatus() == Application.Status.INTERVIEWED).count());
+        model.addAttribute("hiredCount",
+                appList.stream().filter(
+                        a -> a.getStatus() == Application.Status.OFFERED || a.getStatus() == Application.Status.HIRED)
+                        .count());
+        model.addAttribute("rejectedCount", appList.stream().filter(
+                a -> a.getStatus() == Application.Status.REJECTED || a.getStatus() == Application.Status.WITHDRAWN)
+                .count());
 
         return "recruiter/applications";
     }
@@ -269,10 +289,10 @@ public class RecruiterController {
 
         Job job = jobService.getJob(id);
         Page<Application> applications = applicationService.getJobApplications(id,
-                PageRequest.of(page, 10, Sort.by("createdAt").descending()));
+                PageRequest.of(page, 100, Sort.by("createdAt").descending()));
 
         model.addAttribute("job", job);
-        model.addAttribute("applications", applications);
+        model.addAttribute("applications", applications.getContent());
 
         return "recruiter/applications";
     }
@@ -295,6 +315,19 @@ public class RecruiterController {
             return "redirect:/recruiter/jobs/" + jobId + "/applications";
         }
         return "redirect:/recruiter/applications";
+    }
+
+    @PostMapping("/applications/{id}/status-ajax")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> updateApplicationStatusAjax(@PathVariable Long id,
+            @RequestParam Application.Status status) {
+        try {
+            applicationService.updateStatus(id, status, null);
+            return org.springframework.http.ResponseEntity
+                    .ok(java.util.Map.of("message", "Status updated", "status", status.name()));
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/applications/{id}/schedule-interview")

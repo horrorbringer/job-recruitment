@@ -14,6 +14,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/job-seeker")
@@ -25,6 +29,7 @@ public class JobSeekerController {
     private final UserService userService;
     private final JobService jobService;
     private final SavedJobService savedJobService;
+    private final PdfResumeService pdfResumeService;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
@@ -124,6 +129,31 @@ public class JobSeekerController {
         }
 
         return "redirect:/job-seeker/profile";
+    }
+
+    @GetMapping("/resume/generate")
+    public ResponseEntity<byte[]> generateResume(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByEmail(userDetails.getUsername());
+        JobSeeker profile = jobSeekerService.getProfile(user.getId());
+
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        try {
+            byte[] pdfBytes = pdfResumeService.generateResumeBytes(profile);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            // Suggest a nice filename
+            String filename = profile.getFullName().replaceAll("\\s+", "_") + "_Resume.pdf";
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/profile/picture")

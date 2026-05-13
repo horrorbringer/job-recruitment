@@ -1,0 +1,42 @@
+# Job Portal: Future Feature Roadmap
+
+This document outlines high-impact features and enhancements planned for future development phases, organized by priority and user impact.
+
+## Phase 11: Advanced Applicant Tracking (ATS)
+**Target: Recruiter UX Optimization**
+
+*   **Kanban-Style Application Board:** Replace the standard table view with an interactive, drag-and-drop Kanban board (e.g., Trello, Lever). Track candidates across customizable stages (`Applied` -> `Screening` -> [Interview](file:///home/vanny/Sites/assignments/year3s2/recruitment_job/src/main/java/com/recruitment/controller/RecruiterController.java#299-317) -> `Offered` -> `Hired`).
+*   **Bulk Actions:** Allow recruiters to select multiple candidates and send mass rejection emails, interview requests, or status updates.
+
+## Phase 12: Automated Document Generation
+**Target: Job Seeker UX & Value Proposition**
+
+*   **PDF Resume Builder:** Integrate a Java PDF library (like iText or OpenPDF). Connect this to the Job Seeker's Rich Text profile data (Experience, Requirements, Summary) to allow 1-click generation of professional, beautifully formatted, and ATS-friendly PDF resumes.
+*   **Cover Letter Generator:** A simple templated rich-text module allowing seekers to attach customized notes dynamically per application.
+
+## Phase 13: Integrated Communications & Alerts
+**Target: User Engagement & Retention**
+
+*   **Email Notification Engine:** Integrate `Spring Boot Starter Mail` to move beyond in-app notifications.
+    *   **Seekers:** "Daily/Weekly Job Alerts" containing custom matches based on their category/skills.
+    *   **Recruiters:** Instant email alerts for "New Candidate Applications."
+*   **Interview Scheduling Enhancements:** Sync scheduled interviews directly to users' Google/Outlook Calendars via `.ics` file attachments.
+
+## Phase 14: Employer Branding
+**Target: Platform Professionalism & Recruiter Marketing**
+
+*   **Public Company Profiles:** Create dedicated landing pages (e.g., `/companies/tech-corp`) distinct from the Recruiter's private dashboard.
+*   **Features:** Display the company logo, a rich-text "About Us" section (already supported by Quill.js), company size, website link, and a grid of all their active job postings.
+*   **SEO Optimization:** Ensure these pages are statically renderable and SEO-friendly to attract organic traffic for employers.
+
+## Phase 15: Frictionless Onboarding
+**Target: Conversion Rate Optimization**
+
+*   **Social Login (OAuth2):** Integrate Spring Security OAuth2 Client.
+*   **Providers:** Add "Continue with Google" and "Continue with LinkedIn" buttons to the Login and Registration screens to lower the barrier to entry for both Seekers and Recruiters.
+
+## Technical Debt & Infrastructure
+**Ongoing Background Tasks**
+
+*   **Database Indexing:** Ensure queries on [JobRepository](file:///home/vanny/Sites/assignments/year3s2/recruitment_job/src/main/java/com/recruitment/repository/JobRepository.java#14-62) (especially text-based keyword searches and category filtering) are properly indexed in the database (e.g., PostgreSQL Full-Text Search).
+*   **API Documentation:** Finalize Swagger/OpenAPI (`springdoc-openapi-starter-webmvc-ui`) integration for external integrations.

@@ -34,115 +34,228 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <!-- Applicants List Card -->
-    <div class="card border-0 shadow-sm overflow-hidden">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 ats-table">
-                    <thead class="bg-light text-muted">
-                        <tr>
-                            <th class="ps-4 py-3">Candidate</th>
-                            <th>Applied Role</th>
-                            <th>Status</th>
-                            <th>Experience</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white">
-                        <tr th:each="app : ${applications}" class="transition-all">
-                            <td class="ps-4 py-4">
+    <!-- Kanban Board -->
+    <div class="kanban-board gap-4 h-100 mt-4 align-items-start" id="applicantsKanban">
+        
+        <!-- Column 1: Applied -->
+        <div class="kanban-column d-flex flex-column bg-white border border-light shadow-sm rounded-4 p-3" data-status="VIEWED">
+            <h6 class="fw-bold mb-3 d-flex justify-content-between align-items-center text-secondary">
+                <span class="d-flex align-items-center"><span class="badge bg-primary rounded-circle p-1 me-2" style="width: 10px; height: 10px;"></span>Applied</span>
+            </h6>
+            <div class="kanban-dropzone flex-grow-1" id="column-APPLIED">
+                <!-- Empty placeholder for Sortable -->
+                <div class="text-center py-4 mb-2 text-muted small kanban-empty bg-light border border-light rounded-3 shadow-none" th:if="${appliedCount == 0}">
+                    No candidates here
+                </div>
+                <!-- Cards -->
+                <th:block th:each="app : ${applications}">
+                    <div th:if="${app.status.name() == 'APPLIED' || app.status.name() == 'VIEWED'}" class="kanban-card card border-0 shadow-sm mb-3 rounded-3" th:attr="data-id=${app.id}">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-sm bg-soft-primary text-primary rounded-circle p-2 me-3" style="width: 45px; height: 45px;">
-                                        <i class="bi bi-person fs-4"></i>
+                                    <div class="avatar-sm bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-person"></i>
                                     </div>
-                                    <div>
-                                        <button class="btn btn-link text-dark fw-bold text-decoration-none p-0 d-block fs-6" 
-                                                data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
+                                    <div class="lh-1">
+                                        <button class="btn btn-link text-dark fw-bold text-decoration-none p-0 smaller text-start" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
                                             <span th:text="${app.jobSeeker?.fullName}">John Doe</span>
                                         </button>
-                                        <small class="text-muted" th:text="${app.jobSeeker?.user?.email}">john@example.com</small>
+                                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${app.job?.title}">Job Title</div>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="fw-medium text-dark" th:text="${app.job?.title}">Senior Frontend Engineer</div>
-                                <div class="smaller text-muted" th:text="${#temporals.format(app.createdAt, 'dd MMM yyyy')}">Applied Date</div>
-                            </td>
-                            <td>
-                                <span class="badge rounded-pill" th:classappend="${app.status.name() == 'APPLIED'} ? 'bg-soft-primary text-primary' : 
-                                    (${app.status.name() == 'VIEWED'} ? 'bg-soft-info text-info' : 
-                                    (${app.status.name() == 'SHORTLISTED'} ? 'bg-soft-success text-success' : 
-                                    (${app.status.name() == 'INTERVIEW_SCHEDULED'} ? 'bg-soft-warning text-warning' : 
-                                    (${app.status.name() == 'REJECTED'} ? 'bg-soft-danger text-danger' : 'bg-soft-secondary text-secondary'))))" 
-                                      th:text="${app.status.name().replace('_', ' ')}">Status</span>
-                            </td>
-                            <td>
-                                <div class="text-dark small" th:text="${app.jobSeeker?.experienceLevel}">Entry Level</div>
-                                <div class="smaller text-muted" th:text="${app.jobSeeker?.experienceYears + ' Years Exp.'}">2 Years</div>
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
-                                        Profile
-                                    </button>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light rounded-circle shadow-sm" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-                                            <li th:if="${app.status.name() == 'APPLIED'}">
-                                                <form th:action="@{/recruiter/applications/{id}/status(id=${app.id})}" method="post">
-                                                    <input type="hidden" name="status" value="VIEWED">
-                                                    <input type="hidden" name="jobId" th:value="${app.job?.id}">
-                                                    <button type="submit" class="dropdown-item py-2 px-3 small"><i class="bi bi-eye me-2"></i>Mark as Viewed</button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <form th:action="@{/recruiter/applications/{id}/status(id=${app.id})}" method="post">
-                                                    <input type="hidden" name="status" value="SHORTLISTED">
-                                                    <input type="hidden" name="jobId" th:value="${app.job?.id}">
-                                                    <button type="submit" class="dropdown-item py-2 px-3 small"><i class="bi bi-award me-2"></i>Shortlist Candidate</button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item py-2 px-3 small" data-bs-toggle="modal" th:data-bs-target="'#scheduleModal' + ${app.id}">
-                                                    <i class="bi bi-calendar-event me-2"></i>Schedule Interview
-                                                </button>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <form th:action="@{/recruiter/applications/{id}/status(id=${app.id})}" method="post">
-                                                    <input type="hidden" name="status" value="HIRED">
-                                                    <input type="hidden" name="jobId" th:value="${app.job?.id}">
-                                                    <button type="submit" class="dropdown-item py-2 px-3 small text-success"><i class="bi bi-check2-circle me-2"></i>Final Hire</button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <form th:action="@{/recruiter/applications/{id}/status(id=${app.id})}" method="post">
-                                                    <input type="hidden" name="status" value="REJECTED">
-                                                    <input type="hidden" name="jobId" th:value="${app.job?.id}">
-                                                    <button type="submit" class="dropdown-item py-2 px-3 small text-danger"><i class="bi bi-x-circle me-2"></i>Reject</button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light p-0 rounded-circle" style="width: 24px; height: 24px;" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}"><i class="bi bi-eye me-2 text-primary"></i>Review</button></li>
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#scheduleModal' + ${app.id}"><i class="bi bi-calendar me-2 text-warning"></i>Schedule</button></li>
+                                    </ul>
                                 </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Empty State -->
-            <div th:if="${#lists.isEmpty(applications)}" class="text-center py-5">
-                <div class="bg-light rounded-circle p-4 d-inline-block mb-3">
-                    <i class="bi bi-inbox text-muted fs-1"></i>
-                </div>
-                <h5 class="fw-bold">No applications yet</h5>
-                <p class="text-muted mb-4 px-5">When job seekers apply for your roles, they will appear here with detailed profiles for your review.</p>
-                <a th:href="@{/recruiter/jobs/create}" class="btn btn-primary px-4 rounded-pill">Post a Job</a>
+                            </div>
+                            <div class="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <span class="badge bg-soft-primary text-primary border border-primary-subtle rounded-pill fw-normal" th:text="${app.jobSeeker?.experienceLevel}">Entry</span>
+                                <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(app.createdAt, 'MMM dd')}">Date</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
             </div>
         </div>
+
+        <!-- Column 2: Reviewing -->
+        <div class="kanban-column d-flex flex-column bg-white border border-light shadow-sm rounded-4 p-3" data-status="SHORTLISTED">
+            <h6 class="fw-bold mb-3 d-flex justify-content-between align-items-center text-secondary">
+                <span class="d-flex align-items-center"><span class="badge bg-info rounded-circle p-1 me-2" style="width: 10px; height: 10px;"></span>In Review</span>
+            </h6>
+            <div class="kanban-dropzone flex-grow-1" id="column-SHORTLISTED">
+                <!-- Empty placeholder for Sortable -->
+                <div class="text-center py-4 mb-2 text-muted small kanban-empty bg-light border border-light rounded-3 shadow-none" th:if="${reviewCount == 0}">
+                    No candidates here
+                </div>
+                <!-- Cards -->
+                <th:block th:each="app : ${applications}">
+                    <div th:if="${app.status.name() == 'SHORTLISTED'}" class="kanban-card card border-0 shadow-sm mb-3 rounded-3 border-start border-info border-3" th:attr="data-id=${app.id}">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-soft-info text-info rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div class="lh-1">
+                                        <button class="btn btn-link text-dark fw-bold text-decoration-none p-0 smaller text-start" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
+                                            <span th:text="${app.jobSeeker?.fullName}">John Doe</span>
+                                        </button>
+                                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${app.job?.title}">Job Title</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light p-0 rounded-circle" style="width: 24px; height: 24px;" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}"><i class="bi bi-eye me-2 text-primary"></i>Review</button></li>
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#scheduleModal' + ${app.id}"><i class="bi bi-calendar me-2 text-warning"></i>Schedule</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <span class="badge bg-soft-info text-info border border-info-subtle rounded-pill fw-normal" th:text="${app.jobSeeker?.experienceLevel}">Entry</span>
+                                <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(app.createdAt, 'MMM dd')}">Date</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <!-- Column 3: Interviewing -->
+        <div class="kanban-column d-flex flex-column bg-white border border-light shadow-sm rounded-4 p-3" data-status="INTERVIEW_SCHEDULED">
+            <h6 class="fw-bold mb-3 d-flex justify-content-between align-items-center text-secondary">
+                <span class="d-flex align-items-center"><span class="badge bg-warning rounded-circle p-1 me-2" style="width: 10px; height: 10px;"></span>Interviewing</span>
+            </h6>
+            <div class="kanban-dropzone flex-grow-1" id="column-INTERVIEWING">
+                <!-- Empty placeholder for Sortable -->
+                <div class="text-center py-4 mb-2 text-muted small kanban-empty bg-light border border-light rounded-3 shadow-none" th:if="${interviewCount == 0}">
+                    No candidates here
+                </div>
+                <!-- Cards -->
+                <th:block th:each="app : ${applications}">
+                    <div th:if="${app.status.name() == 'INTERVIEW_SCHEDULED' || app.status.name() == 'INTERVIEWED'}" class="kanban-card card border-0 shadow-sm mb-3 rounded-3 border-start border-warning border-3" th:attr="data-id=${app.id}">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-soft-warning text-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div class="lh-1">
+                                        <button class="btn btn-link text-dark fw-bold text-decoration-none p-0 smaller text-start" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
+                                            <span th:text="${app.jobSeeker?.fullName}">John Doe</span>
+                                        </button>
+                                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${app.job?.title}">Job Title</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light p-0 rounded-circle" style="width: 24px; height: 24px;" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}"><i class="bi bi-eye me-2 text-primary"></i>Review</button></li>
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#scheduleModal' + ${app.id}"><i class="bi bi-calendar me-2 text-warning"></i>Schedule</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <span class="badge bg-soft-warning text-warning border border-warning-subtle rounded-pill fw-normal" th:text="${app.jobSeeker?.experienceLevel}">Entry</span>
+                                <span class="text-muted" style="font-size: 0.7rem;" th:if="${app.interviewDateTime}"><i class="bi bi-calendar-event me-1"></i><span th:text="${#temporals.format(app.interviewDateTime, 'MMM dd, HH:mm')}">Date</span></span>
+                                <span class="text-muted" style="font-size: 0.7rem;" th:unless="${app.interviewDateTime}"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(app.createdAt, 'MMM dd')}">Date</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <!-- Column 4: Offered/Hired -->
+        <div class="kanban-column d-flex flex-column bg-white border border-light shadow-sm rounded-4 p-3" data-status="HIRED">
+            <h6 class="fw-bold mb-3 d-flex justify-content-between align-items-center text-secondary">
+                <span class="d-flex align-items-center"><span class="badge bg-success rounded-circle p-1 me-2" style="width: 10px; height: 10px;"></span>Hired</span>
+            </h6>
+            <div class="kanban-dropzone flex-grow-1" id="column-HIRED">
+                <!-- Empty placeholder for Sortable -->
+                <div class="text-center py-4 mb-2 text-muted small kanban-empty bg-light border border-light rounded-3 shadow-none" th:if="${hiredCount == 0}">
+                    No candidates here
+                </div>
+                <!-- Cards -->
+                <th:block th:each="app : ${applications}">
+                    <div th:if="${app.status.name() == 'OFFERED' || app.status.name() == 'HIRED'}" class="kanban-card card border-0 shadow-sm mb-3 rounded-3 border-start border-success border-3" th:attr="data-id=${app.id}">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-soft-success text-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div class="lh-1">
+                                        <button class="btn btn-link text-dark fw-bold text-decoration-none p-0 smaller text-start" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
+                                            <span th:text="${app.jobSeeker?.fullName}">John Doe</span>
+                                        </button>
+                                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${app.job?.title}">Job Title</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light p-0 rounded-circle" style="width: 24px; height: 24px;" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}"><i class="bi bi-eye me-2 text-primary"></i>Review</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <span class="badge bg-soft-success text-success border border-success-subtle rounded-pill fw-normal" th:text="${app.jobSeeker?.experienceLevel}">Entry</span>
+                                <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(app.statusUpdatedAt ?: app.createdAt, 'MMM dd')}">Date</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <!-- Column 5: Rejected -->
+        <div class="kanban-column d-flex flex-column bg-white border border-light shadow-sm rounded-4 p-3" data-status="REJECTED">
+            <h6 class="fw-bold mb-3 d-flex justify-content-between align-items-center text-secondary">
+                <span class="d-flex align-items-center"><span class="badge bg-danger rounded-circle p-1 me-2" style="width: 10px; height: 10px;"></span>Rejected</span>
+            </h6>
+            <div class="kanban-dropzone flex-grow-1" id="column-REJECTED">
+                <!-- Empty placeholder for Sortable -->
+                <div class="text-center py-4 mb-2 text-muted small kanban-empty bg-light border border-light rounded-3 shadow-none" th:if="${rejectedCount == 0}">
+                    No candidates here
+                </div>
+                <!-- Cards -->
+                <th:block th:each="app : ${applications}">
+                    <div th:if="${app.status.name() == 'REJECTED' || app.status.name() == 'WITHDRAWN'}" class="kanban-card card border-0 shadow-sm mb-3 rounded-3 border-start border-danger border-3 opacity-75" th:attr="data-id=${app.id}">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-soft-danger text-danger rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div class="lh-1">
+                                        <button class="btn btn-link text-dark fw-bold text-decoration-none p-0 smaller text-start" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}">
+                                            <span class="text-decoration-line-through" th:text="${app.jobSeeker?.fullName}">John Doe</span>
+                                        </button>
+                                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${app.job?.title}">Job Title</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light p-0 rounded-circle" style="width: 24px; height: 24px;" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                        <li><button class="dropdown-item py-2" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${app.id}"><i class="bi bi-eye me-2 text-primary"></i>Review</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <span class="badge bg-soft-danger text-danger border border-danger-subtle rounded-pill fw-normal">Closed</span>
+                                <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(app.statusUpdatedAt ?: app.createdAt, 'MMM dd')}">Date</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
     </div>
 
     <!-- Profile Detail Modal -->
@@ -277,6 +390,78 @@
             </div>
         </div>
     </div>
+
+    <!-- Script Integration for Kanban -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const kanbanZones = document.querySelectorAll('.kanban-dropzone');
+            
+            kanbanZones.forEach(zone => {
+                new Sortable(zone, {
+                    group: 'ats-kanban',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    onAdd: function (evt) {
+                        const itemEl = evt.item;
+                        const targetColumn = evt.to.closest('.kanban-column');
+                        const newStatus = targetColumn.getAttribute('data-status');
+                        const applicationId = itemEl.getAttribute('data-id');
+
+                        const formData = new URLSearchParams();
+                        formData.append('status', newStatus);
+
+                        // Extract CSRF token if present globally
+                        const csrfInput = document.querySelector('form input[name="_csrf"]');
+                        if (csrfInput) {
+                            formData.append('_csrf', csrfInput.value);
+                        }
+
+                        fetch(`/recruiter/applications/${applicationId}/status-ajax`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: formData.toString()
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Update failed');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Status updated:', data);
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            alert('Status update failed. Reverting changes...');
+                            window.location.reload();
+                        });
+                        
+                        updateEmptyStates();
+                    },
+                    onRemove: function() {
+                        updateEmptyStates();
+                    }
+                });
+            });
+
+            function updateEmptyStates() {
+                document.querySelectorAll('.kanban-dropzone').forEach(zone => {
+                    const emptyEl = zone.querySelector('.kanban-empty');
+                    if (emptyEl) {
+                        const cards = zone.querySelectorAll('.kanban-card');
+                        // Filter out empty spaces and Sortable's ghost elements
+                        const realCards = Array.from(cards).filter(c => !c.classList.contains('sortable-ghost'));
+                        emptyEl.style.display = realCards.length > 0 ? 'none' : 'block';
+                    }
+                });
+            }
+            
+            // Initial call to hide empty states if needed
+            updateEmptyStates();
+        });
+    </script>
 </main>
 </body>
 </html>
