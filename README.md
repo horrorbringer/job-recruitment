@@ -77,6 +77,26 @@ java -jar target/recruitment-job-1.0.0.jar
 
 4. **Access the app**: http://localhost:8081
 
+### Local Docker Test
+
+If you already use Laravel Herd or another local web server on port `80`, use the local Docker stack instead of the production one:
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+```
+
+Open:
+
+```text
+http://localhost:8080
+```
+
+This local stack includes:
+
+- PostgreSQL
+- Spring Boot app
+- Nginx on port `8080`
+
 ### Default Users
 
 | Role | Email | Password |

@@ -3,22 +3,22 @@ spring:
     name: recruitment-job
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/recruitment
-    username: recruitment_user
-    password: recruitment_pass
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/recruitment}
+    username: ${DB_USERNAME:recruitment_user}
+    password: ${DB_PASSWORD:recruitment_pass}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        format_sql: ${JPA_FORMAT_SQL:true}
 
   servlet:
     multipart:
@@ -26,39 +26,40 @@ spring:
       max-request-size: 10MB
 
   thymeleaf:
-    cache: false
+    cache: ${THYMELEAF_CACHE:false}
     prefix: classpath:/templates/
     suffix: .html
 
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${MAIL_SMTP_AUTH:true}
           starttls:
-            enable: true
+            enable: ${MAIL_SMTP_STARTTLS_ENABLE:true}
 
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
   error:
     path: /error
 
 logging:
   level:
-    com.recruitment: DEBUG
-    org.springframework.security: INFO
-    org.hibernate.SQL: DEBUG
+    com.recruitment: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
 
 app:
   upload:
-    dir: uploads
+    dir: ${APP_UPLOAD_DIR:uploads}
     resume:
-      max-size: 5242880
+      max-size: ${APP_UPLOAD_RESUME_MAX_SIZE:5242880}
       allowed-types: pdf,doc,docx
     image:
-      max-size: 2097152
+      max-size: ${APP_UPLOAD_IMAGE_MAX_SIZE:2097152}
       allowed-types: jpg,jpeg,png,webp
