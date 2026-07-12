@@ -53,7 +53,7 @@ public class MessageService {
     }
 
     public List<Message> getMessageSummary(User user) {
-        return messageRepository.findLatestMessagesPerConversation(user);
+        return messageRepository.findLatestMessagesPerConversation(user.getId());
     }
 
     public long getUnreadCount(User user) {

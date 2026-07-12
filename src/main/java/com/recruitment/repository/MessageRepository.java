@@ -22,8 +22,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     long countUnreadForUser(@Param("user") User user);
 
     @Query("SELECT m FROM Message m WHERE m.id IN (" +
-            "SELECT MAX(m2.id) FROM Message m2 WHERE m2.sender = :user OR m2.receiver = :user " +
-            "GROUP BY CASE WHEN m2.sender = :user THEN m2.receiver ELSE m2.sender END) " +
+            "SELECT MAX(m2.id) FROM Message m2 WHERE m2.sender.id = :userId OR m2.receiver.id = :userId " +
+            "GROUP BY CASE WHEN m2.sender.id = :userId THEN m2.receiver.id ELSE m2.sender.id END) " +
             "ORDER BY m.createdAt DESC")
-    List<Message> findLatestMessagesPerConversation(@Param("user") User user);
+    List<Message> findLatestMessagesPerConversation(@Param("userId") Long userId);
 }
